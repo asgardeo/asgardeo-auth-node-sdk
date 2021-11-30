@@ -1,0 +1,20 @@
+{
+  "name": "asgardeo-auth-nodejs-sample",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  },
+  "dependencies": {
+    "@asgardeo/auth-nodejs-sdk": "file:../lib",
+    "cookie-parser": "^1.4.6",
+    "express": "^4.17.1"
+  }
+}

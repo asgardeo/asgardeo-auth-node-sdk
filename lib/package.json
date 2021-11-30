@@ -1,0 +1,22 @@
+{
+  "name": "@asgardeo/auth-nodejs-sdk",
+  "version": "0.0.1",
+  "description": "Asgardeo Auth NodeJS SDK and Sample Apps",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "cross-env NODE_ENV=production rimraf dist && rimraf umd && npm run type-check",
+    "type-check": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@asgardeo/auth-js": "file:../../asgardeo-auth-js-sdk/lib",
+    "typescript": "^4.5.2"
+  },
+  "dependencies": {
+    "cross-env": "^7.0.3",
+    "memory-cache": "^0.2.0"
+  }
+}
