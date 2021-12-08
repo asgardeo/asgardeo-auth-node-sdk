@@ -11,22 +11,48 @@ const app = express();
 app.use(cookieParser());
 
 //Initialize Asgardeo Auth
-const auth = AsgardeoAuth.initializeApp(config);
+const authClient = new AsgardeoAuth.AsgardeoAuth(config);
+
 
 //Routes
 app.get("/login", (req, res) => {
-    testSDK.getAuthURL(auth).then(url => {
+    authClient.getAuthURL().then(url => {
         console.log(url)
-        if (url){
+        if (url) {
             res.redirect(url)
         }
     }).catch(err => {
         console.log(err)
+        res.status(400).send({
+            "message": "Failed"
+        })
     })
 });
 
+app.get("/authorize", (req, res) => {
+    if (req.query.code) {
+        authClient.requestAccessToken(req.query.code, req.query.session_state).then(response => {
+            // console.log("token", response)
+            res.send(response)
+        }).catch(err => {
+            console.log(err)
+            res.send(err)
+        })
+    }
+});
+
+app.get("/id", (req, res) => {
+    authClient.getIDToken().then(response => {
+        console.log("id", response)
+        res.send(response)
+    }).catch(err => {
+        console.log(err)
+        res.send(err)
+    })
+
+});
 //Start the app and listen on PORT 5000
-app.listen(PORT, ()=> {console.log(`Server Started at PORT ${PORT}`)});
+app.listen(PORT, () => { console.log(`Server Started at PORT ${PORT}`) });
 
 
 

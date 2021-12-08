@@ -5,7 +5,7 @@ const config = {
     "signOutRedirectURL": "http://localhost:5000/logoutsuccess",
     "enableOIDCSessionManagement": true,
     "scope": ["openid", "profile"],
-    "validateIDToken": false,
-    "devEnvironment": "NODE",
+    "validateIDToken": true,
+    "runtimeEnvironment": "NODE",
 }
 module.exports = config;

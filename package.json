@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Asgardeo Auth NodeJS SDK and Sample Apps",
   "main": "index.js",
-  "scripts": {
+  "scripts": { 
     "build": "lerna run build --stream",
     "test": "echo \"Error: no test specified\" && exit 1",
     "bootstrap": "npm install && lerna bootstrap"

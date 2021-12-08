@@ -15,24 +15,5 @@
  * specific language governing permissions and limitations
  * under the License.
  */
- import { NodeStore } from "../models";
- import cache from 'memory-cache';
 
- export class MemoryCacheStore implements NodeStore {
-    public async setData(key: string, value: string): Promise<void> {
-        cache.put(key, value);
-    }
-
-    public async getData(key: string): Promise<string> {
-        return cache.get(key) ?? "{}";
-    }
-
-    public async removeData(key: string): Promise<void> {
-        cache.del(key);
-    }
-
-    public async getKeys() : Promise<string[]>{
-        return cache.keys();
-    }
-}
-
+export * from "./store";

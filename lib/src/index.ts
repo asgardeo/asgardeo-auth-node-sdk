@@ -16,5 +16,4 @@
  * under the License.
  */
 
-import { initializeApp, getAuthURL } from "./core/authentication";
-export { initializeApp, getAuthURL };
+export * from "./core/authentication";
