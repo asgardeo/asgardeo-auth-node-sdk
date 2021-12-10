@@ -11,13 +11,11 @@ export class SessionUtils{
     }
 
     public static validateUUID(uuid: string): Promise<Boolean> {
-        return new Promise((resolve, reject) => {
             if (uuidValidate(uuid) && uuidVersion(uuid) === UUID_VERSION) {
-                resolve(true)
+                return Promise.resolve(true)
             } else {
-                resolve(false);
+                return Promise.resolve(false);
             }
-        });
     }
 
 }

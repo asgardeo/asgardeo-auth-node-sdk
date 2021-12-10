@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import {AsgardeoAuthClient } from '@asgardeo/auth-js';
+import { AsgardeoAuthClient } from '@asgardeo/auth-js';
 import { AsgardeoAuthException } from "../exception";
 import { NodeStore } from '../models';
 import { MemoryCacheStore } from "../stores";
@@ -24,24 +24,28 @@ import { UserSession } from '../session';
 
 export class AsgardeoAuth<T>{
 
-    private _auth :AsgardeoAuthClient<T>;
+    private _auth: AsgardeoAuthClient<T>;
     private _store: NodeStore;
     private _sessionStore: UserSession;
 
     //TODO: Add the type here
-    constructor(config: any){
+    constructor(config: any) {
         this._store = new MemoryCacheStore();
         this._auth = new AsgardeoAuthClient(this._store);
         this._sessionStore = new UserSession(this._store);
         this._auth.initialize(config);
     }
 
-    public async getAuthURL() : Promise<object> {
-        return new Promise((resolve, reject) => {
-            this._auth.getAuthorizationURL().then((url: any) => {
-                resolve(url);
-            }).catch((reject));
-        });
+    public async getAuthURL(): Promise<string> {
+
+        const authURL = await this._auth.getAuthorizationURL();
+
+        if (authURL) {
+            return Promise.resolve(authURL.toString())
+        } else {
+            return Promise.reject();
+        }
+
     }
 
     public async requestAccessToken(authorizationCode: string, sessionState: string): Promise<object> {
@@ -62,25 +66,68 @@ export class AsgardeoAuth<T>{
             )
         }
 
-        const user_session = await this._sessionStore.getUserSession(sub_from_token.sub);
+        const user_session = await this._sessionStore.getUserSession();
         console.log(user_session)
 
         //Create a new session if one does not exists
-        if(user_session){
+        if (user_session) {
             const new_user_session = await this._sessionStore.createUserSession(sub_from_token.sub, access_token);
         }
         //DEBUG
         console.log(cache.keys());
         return Promise.resolve(access_token);
-        
+
     }
-    
+
     public async getIDToken(): Promise<string> {
-        return new Promise((resolve, reject) => {
-            this._auth.getIDToken().then((response: any) => {
-                resolve(response);
-            }).catch((reject));
-        });
+
+        const idToken = this._auth.getIDToken();
+        if (idToken) {
+            return Promise.resolve(idToken)
+        } else {
+            return Promise.reject();
+        }
+    }
+
+
+    public async signout(): Promise<string> {
+
+        const signOutURL = await this._auth.signOut();
+        const destroySession = await this._sessionStore.destroyUserSession();
+
+        if (!signOutURL || !destroySession) {
+            return Promise.reject(
+                new AsgardeoAuthException(
+                    "AUTH_CORE-RAT1-NF01", //TODO: Not sure
+                    "node-authentication",
+                    "signout",
+                    "Signing out the user failed.",
+                    "Could not obtain the signout URL from the server."
+                )
+            )
+        }
+
+        return Promise.resolve(signOutURL);
+    }
+
+    public async getSignoutURL(): Promise<string> {
+
+        const signOutURL = await this._auth.getSignOutURL();
+        const destroySession = await this._sessionStore.destroyUserSession();
+
+        if (!signOutURL || !destroySession) {
+            return Promise.reject(
+                new AsgardeoAuthException(
+                    "AUTH_CORE-RAT1-NF01", //TODO: Not sure
+                    "node-authentication",
+                    "signout",
+                    "Signing out the user failed.",
+                    "Could not obtain the signout URL from the server."
+                )
+            )
+        }
+
+        return Promise.resolve(signOutURL);
     }
 
 }

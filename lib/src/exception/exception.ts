@@ -16,32 +16,31 @@
  * under the License.
  */
 
- import { AsgardeoAuthNetworkException } from ".";
+import { AsgardeoAuthNetworkException } from ".";
 
- export class AsgardeoAuthException extends Error {
-     public name: string;
-     public code: string | undefined;
-     public file: string;
-     public method: string;
-     public description: string | undefined;
-     public error: AsgardeoAuthException | AsgardeoAuthNetworkException | undefined;
- 
-     public constructor(
-         code: string | undefined,
-         file: string,
-         method: string,
-         message?: string,
-         description?: string,
-         error?: AsgardeoAuthException | AsgardeoAuthNetworkException | undefined
-     ) {
-         super(message ?? error?.message);
-         this.name = this.constructor.name;
-         this.code = code;
-         this.file = file;
-         this.method = method;
-         this.description = description;
-         this.error = error;
-         Object.setPrototypeOf(this, new.target.prototype);
-     }
- }
- 
+export class AsgardeoAuthException extends Error {
+    public name: string;
+    public code: string | undefined;
+    public file: string;
+    public method: string;
+    public description: string | undefined;
+    public error: AsgardeoAuthException | AsgardeoAuthNetworkException | undefined;
+
+    public constructor(
+        code: string | undefined,
+        file: string,
+        method: string,
+        message?: string,
+        description?: string,
+        error?: AsgardeoAuthException | AsgardeoAuthNetworkException | undefined
+    ) {
+        super(message ?? error?.message);
+        this.name = this.constructor.name;
+        this.code = code;
+        this.file = file;
+        this.method = method;
+        this.description = description;
+        this.error = error;
+        Object.setPrototypeOf(this, new.target.prototype);
+    }
+}
