@@ -42,18 +42,6 @@ export class UserSession {
     }
 
     public async getUserSession(): Promise<object> {
-        if (!this._userUUID) {
-            return Promise.reject(
-                new AsgardeoAuthException(
-                    "AUTH_CORE-RAT1-NF01", //TODO: Not sure
-                    "user-session",
-                    "getUserSession",
-                    "User UUID is not found",
-                    "No token endpoint was found in the OIDC provider meta data returned by the well-known endpoint " +
-                    "or the token endpoint passed to the SDK is empty."
-                )
-            )
-        }
         const sessionData = await this._sessionStore.getData(this._userUUID);
         if (sessionData) {
             return Promise.resolve(JSON.parse(sessionData))

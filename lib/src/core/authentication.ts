@@ -67,10 +67,9 @@ export class AsgardeoAuth<T>{
         }
 
         const user_session = await this._sessionStore.getUserSession();
-        console.log(user_session)
 
         //Create a new session if one does not exists
-        if (user_session) {
+        if (Object.keys(user_session).length === 0) {
             const new_user_session = await this._sessionStore.createUserSession(sub_from_token.sub, access_token);
         }
         //DEBUG
