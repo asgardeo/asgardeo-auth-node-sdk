@@ -15,6 +15,12 @@ const authClient = new AsgardeoAuth.AsgardeoAuth(config);
 
 
 //Routes
+app.get("/", (req,res) => {
+    res.send("Hello World")
+})
+
+
+
 app.get("/login", (req, res) => {
     authClient.getAuthURL().then(url => {
         console.log(url)
@@ -33,6 +39,7 @@ app.get("/authorize", (req, res) => {
     if (req.query.code) {
         authClient.requestAccessToken(req.query.code, req.query.session_state).then(response => {
             // console.log("token", response)
+            res.cookie('ASGARDEO_SESSION_ID',response.session, { maxAge: 900000, httpOnly: true });
             res.send(response)
         }).catch(err => {
             console.log(err)
@@ -43,14 +50,29 @@ app.get("/authorize", (req, res) => {
 
 app.get("/id", (req, res) => {
     authClient.getIDToken().then(response => {
-        console.log("id", response)
         res.send(response)
     }).catch(err => {
         console.log(err)
         res.send(err)
     })
+});
+
+app.get("/logout", (req, res) => {
+    if (req.cookies.ASGARDEO_SESSION_ID === undefined) {
+        res.send("Unauthenticated")
+    } else {
+        authClient.signout().then(response => {
+            res.cookie('ASGARDEO_SESSION_ID',null, { maxAge: 0 });
+            res.redirect(response)
+        }).catch(err => {
+            console.log(err)
+            res.send(err)
+        })
+    }
 
 });
+
+
 //Start the app and listen on PORT 5000
 app.listen(PORT, () => { console.log(`Server Started at PORT ${PORT}`) });
 

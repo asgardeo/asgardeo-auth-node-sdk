@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { AsgardeoAuthClient } from '@asgardeo/auth-js';
+import { AsgardeoAuthClient, AuthClientConfig } from '@asgardeo/auth-js';
 import { AsgardeoAuthException } from "../exception";
 import { NodeStore } from '../models';
 import { MemoryCacheStore } from "../stores";
@@ -29,8 +29,14 @@ export class AsgardeoAuth<T>{
     private _sessionStore: UserSession;
 
     //TODO: Add the type here
-    constructor(config: any) {
-        this._store = new MemoryCacheStore();
+    constructor(config:AuthClientConfig<T>, store?: NodeStore) {
+
+        if(!store) {
+            this._store = new MemoryCacheStore();
+        }else{
+            this._store = store;
+        }
+
         this._auth = new AsgardeoAuthClient(this._store);
         this._sessionStore = new UserSession(this._store);
         this._auth.initialize(config);
@@ -67,24 +73,52 @@ export class AsgardeoAuth<T>{
         }
 
         const user_session = await this._sessionStore.getUserSession();
+        let new_user_session = "";
 
         //Create a new session if one does not exists
         if (Object.keys(user_session).length === 0) {
-            const new_user_session = await this._sessionStore.createUserSession(sub_from_token.sub, access_token);
+            new_user_session = await this._sessionStore.createUserSession(sub_from_token.sub, access_token);
         }
         //DEBUG
         console.log(cache.keys());
-        return Promise.resolve(access_token);
+
+        const access_token_response = {
+            payload: access_token,
+            session: new_user_session
+        }
+        return Promise.resolve(access_token_response);
 
     }
 
     public async getIDToken(): Promise<string> {
 
-        const idToken = this._auth.getIDToken();
+        const user_session = await this._sessionStore.getUserSession();
+        if (Object.keys(user_session).length === 0) {
+            return Promise.reject(
+                new AsgardeoAuthException(
+                    "AUTH_CORE-RAT1-NF01", //TODO: Not sure
+                    "node-authentication",
+                    "getIDToken",
+                    "The user is not logged in.",
+                    "No token endpoint was found in the OIDC provider meta data returned by the well-known endpoint " +
+                    "or the token endpoint passed to the SDK is empty."
+                )
+            )
+        }
+        const idToken = await this._auth.getIDToken();
         if (idToken) {
             return Promise.resolve(idToken)
         } else {
-            return Promise.reject();
+            return Promise.reject(
+                new AsgardeoAuthException(
+                    "AUTH_CORE-RAT1-NF01", //TODO: Not sure
+                    "node-authentication",
+                    "getIDToken",
+                    "Requesting ID Token Failed",
+                    "No token endpoint was found in the OIDC provider meta data returned by the well-known endpoint " +
+                    "or the token endpoint passed to the SDK is empty."
+                )
+            )
         }
     }
 
@@ -105,7 +139,7 @@ export class AsgardeoAuth<T>{
                 )
             )
         }
-
+        console.log(cache.keys());
         return Promise.resolve(signOutURL);
     }
 
@@ -113,6 +147,9 @@ export class AsgardeoAuth<T>{
 
         const signOutURL = await this._auth.getSignOutURL();
         const destroySession = await this._sessionStore.destroyUserSession();
+        
+        //DEBUG
+        console.log(cache.keys())
 
         if (!signOutURL || !destroySession) {
             return Promise.reject(

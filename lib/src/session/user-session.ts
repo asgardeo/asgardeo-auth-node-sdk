@@ -17,7 +17,7 @@ export class UserSession {
         this._userUUID = "";
     }
 
-    public async createUserSession(sub: string, sessionData: TokenResponse): Promise<Boolean> {
+    public async createUserSession(sub: string, sessionData: TokenResponse): Promise<string> {
 
         const user_uuid = SessionUtils.createUUID(sub);
 
@@ -36,14 +36,13 @@ export class UserSession {
 
         this._userUUID = user_uuid;
         const new_session = this._sessionStore.setData(user_uuid, sessionData.toString());
-
-        return Promise.resolve(true);
+        return Promise.resolve(user_uuid);
 
     }
 
     public async getUserSession(): Promise<object> {
         const sessionData = await this._sessionStore.getData(this._userUUID);
-        if (sessionData) {
+        if (Object.keys(sessionData).length !== 0) {
             return Promise.resolve(JSON.parse(sessionData))
         } else {
             return Promise.resolve(JSON.parse('{}'));
