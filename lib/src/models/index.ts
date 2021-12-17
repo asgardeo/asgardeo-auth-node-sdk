@@ -15,5 +15,4 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-export * from "./store";
+export * from "./token-response";

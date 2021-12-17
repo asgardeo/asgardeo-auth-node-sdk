@@ -15,10 +15,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { NodeStore } from "../models";
+import { Store } from "@asgardeo/auth-js";
 import cache from 'memory-cache';
 
-export class MemoryCacheStore implements NodeStore {
+export class MemoryCacheStore implements Store {
     public async setData(key: string, value: string): Promise<void> {
         cache.put(key, value);
     }
@@ -31,7 +31,4 @@ export class MemoryCacheStore implements NodeStore {
         cache.del(key);
     }
 
-    public async getKeys(): Promise<string[]> {
-        return cache.keys();
-    }
 }

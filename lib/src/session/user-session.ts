@@ -1,20 +1,13 @@
 import { AsgardeoAuthException } from '../exception';
-import { NodeStore } from '../models';
-import { TokenResponse } from '@asgardeo/auth-js'
+import { TokenResponse, Store } from '@asgardeo/auth-js';
 import { SessionUtils } from '../utils';
 
 export class UserSession {
 
-    private _sessionStore: NodeStore;
-    private _userUUID: string;
+    private _sessionStore: Store;
 
-    public get getUserUUID(): string {
-        return this._userUUID;
-    }
-
-    constructor(store: NodeStore) {
+    constructor(store: Store) {
         this._sessionStore = store;
-        this._userUUID = "";
     }
 
     public async createUserSession(sub: string, sessionData: TokenResponse): Promise<string> {
@@ -34,24 +27,25 @@ export class UserSession {
             );
         }
 
-        this._userUUID = user_uuid;
-        const new_session = this._sessionStore.setData(user_uuid, sessionData.toString());
+        const new_session = this._sessionStore.setData(user_uuid, JSON.stringify(sessionData));
         return Promise.resolve(user_uuid);
 
     }
 
-    public async getUserSession(): Promise<object> {
-        const sessionData = await this._sessionStore.getData(this._userUUID);
-        if (Object.keys(sessionData).length !== 0) {
-            return Promise.resolve(JSON.parse(sessionData))
-        } else {
-            return Promise.resolve(JSON.parse('{}'));
-        }
+    public async getUserSession(uuid: string): Promise<object> {
+        const sessionData = await this._sessionStore.getData(uuid);
+        console.log(JSON.stringify(sessionData))
+        return Promise.resolve(JSON.parse(sessionData))
     }
 
-    public async destroyUserSession(): Promise<Boolean> {
+    public async getUUID(sub: string): Promise<string>{
+        const uuid = SessionUtils.createUUID(sub);
+        return uuid;
+    }
 
-        if (!this._userUUID) {
+    public async destroyUserSession(uuid: string): Promise<Boolean> {
+
+        if (!uuid) {
             Promise.reject(
                 new AsgardeoAuthException(
                     "AUTH_CORE-RAT1-NF01", //TODO: Not sure
@@ -64,10 +58,11 @@ export class UserSession {
             )
         }
 
-        const isValidUUID = await SessionUtils.validateUUID(this._userUUID);
+        const isValidUUID = await SessionUtils.validateUUID(uuid);
 
         if (isValidUUID) {
-            const removeData = await this._sessionStore.removeData(this._userUUID);
+            const removeData = await this._sessionStore.removeData(uuid);
+            uuid = "";
             return Promise.resolve(true);
         } else {
             return Promise.reject(

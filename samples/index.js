@@ -15,7 +15,7 @@ const authClient = new AsgardeoAuth.AsgardeoAuth(config);
 
 
 //Routes
-app.get("/", (req,res) => {
+app.get("/", (req, res) => {
     res.send("Hello World")
 })
 
@@ -39,7 +39,7 @@ app.get("/authorize", (req, res) => {
     if (req.query.code) {
         authClient.requestAccessToken(req.query.code, req.query.session_state).then(response => {
             // console.log("token", response)
-            res.cookie('ASGARDEO_SESSION_ID',response.session, { maxAge: 900000, httpOnly: true });
+            res.cookie('ASGARDEO_SESSION_ID', response.session, { maxAge: 900000, httpOnly: true });
             res.send(response)
         }).catch(err => {
             console.log(err)
@@ -49,20 +49,24 @@ app.get("/authorize", (req, res) => {
 });
 
 app.get("/id", (req, res) => {
-    authClient.getIDToken().then(response => {
-        res.send(response)
-    }).catch(err => {
-        console.log(err)
-        res.send(err)
-    })
+    if (req.cookies.ASGARDEO_SESSION_ID === undefined) {
+        res.send("Unauthenticated")
+    } else {
+        authClient.getIDToken(req.cookies.ASGARDEO_SESSION_ID).then(response => {
+            res.send(response)
+        }).catch(err => {
+            console.log(err)
+            res.send(err)
+        })
+    }
 });
 
 app.get("/logout", (req, res) => {
     if (req.cookies.ASGARDEO_SESSION_ID === undefined) {
         res.send("Unauthenticated")
     } else {
-        authClient.signout().then(response => {
-            res.cookie('ASGARDEO_SESSION_ID',null, { maxAge: 0 });
+        authClient.getSignoutURL(req.cookies.ASGARDEO_SESSION_ID).then(response => {
+            res.cookie('ASGARDEO_SESSION_ID', null, { maxAge: 0 });
             res.redirect(response)
         }).catch(err => {
             console.log(err)

@@ -15,9 +15,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { AsgardeoAuthClient, AuthClientConfig } from '@asgardeo/auth-js';
+import { AsgardeoAuthClient, AuthClientConfig, Store } from "@asgardeo/auth-js";
 import { AsgardeoAuthException } from "../exception";
-import { NodeStore } from '../models';
+import { NodeTokenResponse } from '../models';
 import { MemoryCacheStore } from "../stores";
 import cache from 'memory-cache'; // Only for debugging
 import { UserSession } from '../session';
@@ -25,15 +25,16 @@ import { UserSession } from '../session';
 export class AsgardeoAuth<T>{
 
     private _auth: AsgardeoAuthClient<T>;
-    private _store: NodeStore;
+    private _store: Store;
     private _sessionStore: UserSession;
 
     //TODO: Add the type here
-    constructor(config:AuthClientConfig<T>, store?: NodeStore) {
+    constructor(config: AuthClientConfig<T>, store?: Store) {
 
-        if(!store) {
+        //Initialize the default memory cache store if an external store is not passed.
+        if (!store) {
             this._store = new MemoryCacheStore();
-        }else{
+        } else {
             this._store = store;
         }
 
@@ -54,7 +55,7 @@ export class AsgardeoAuth<T>{
 
     }
 
-    public async requestAccessToken(authorizationCode: string, sessionState: string): Promise<object> {
+    public async requestAccessToken(authorizationCode: string, sessionState: string): Promise<NodeTokenResponse> {
 
         const access_token = await this._auth.requestAccessToken(authorizationCode, sessionState);
         const sub_from_token = await this._auth.getDecodedIDToken();
@@ -72,27 +73,31 @@ export class AsgardeoAuth<T>{
             )
         }
 
-        const user_session = await this._sessionStore.getUserSession();
-        let new_user_session = "";
+        //Create a UUID and check if the user has a session already
+        const user_uuid = await this._sessionStore.getUUID(sub_from_token.sub);
+        const existing_user = await this._sessionStore.getUserSession(user_uuid);
 
-        //Create a new session if one does not exists
-        if (Object.keys(user_session).length === 0) {
-            new_user_session = await this._sessionStore.createUserSession(sub_from_token.sub, access_token);
+        //Declare the response type
+        let response: NodeTokenResponse = { ...access_token, session: "" };
+
+        if (Object.keys(existing_user).length === 0) {
+            //Create a new session if the user does not have one already
+            const new_user_session = await this._sessionStore.createUserSession(sub_from_token.sub, access_token)
+            response = { ...access_token, session: new_user_session };
+        } else {
+            response = { ...access_token, session: user_uuid };
         }
+
         //DEBUG
         console.log(cache.keys());
 
-        const access_token_response = {
-            payload: access_token,
-            session: new_user_session
-        }
-        return Promise.resolve(access_token_response);
+        return Promise.resolve(response);
 
     }
 
-    public async getIDToken(): Promise<string> {
+    public async getIDToken(uuid: string): Promise<string> {
 
-        const user_session = await this._sessionStore.getUserSession();
+        const user_session = await this._sessionStore.getUserSession(uuid);
         if (Object.keys(user_session).length === 0) {
             return Promise.reject(
                 new AsgardeoAuthException(
@@ -123,10 +128,10 @@ export class AsgardeoAuth<T>{
     }
 
 
-    public async signout(): Promise<string> {
+    public async signOut(uuid: string): Promise<string> {
 
         const signOutURL = await this._auth.signOut();
-        const destroySession = await this._sessionStore.destroyUserSession();
+        const destroySession = await this._sessionStore.destroyUserSession(uuid);
 
         if (!signOutURL || !destroySession) {
             return Promise.reject(
@@ -143,11 +148,11 @@ export class AsgardeoAuth<T>{
         return Promise.resolve(signOutURL);
     }
 
-    public async getSignoutURL(): Promise<string> {
+    public async getSignoutURL(uuid: string): Promise<string> {
 
         const signOutURL = await this._auth.getSignOutURL();
-        const destroySession = await this._sessionStore.destroyUserSession();
-        
+        const destroySession = await this._sessionStore.destroyUserSession(uuid);
+
         //DEBUG
         console.log(cache.keys())
 
