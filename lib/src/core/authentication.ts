@@ -135,21 +135,21 @@ export class AsgardeoAuth<T>{
             const isAsgardeoAuthenticated = await this._auth.isAuthenticated();
 
             if (isAsgardeoAuthenticated && isAsgardeoAuthenticated) {
-                return Promise.resolve(true)
+                return Promise.resolve(true);
             } else {
-                return Promise.resolve(false)
+                return Promise.resolve(false);
             }
         } catch (error) {
             return Promise.reject(
                 new AsgardeoAuthException(
                     "AUTH_CORE-RAT1-NF01", //TODO: Not sure
                     "node-authentication",
-                    "getIDToken",
+                    "isAuthenticated",
                     "Requesting ID Token Failed",
                     "No token endpoint was found in the OIDC provider meta data returned by the well-known endpoint " +
                     "or the token endpoint passed to the SDK is empty."
                 )
-            )
+            );
         }
     }
 

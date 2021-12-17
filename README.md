@@ -21,6 +21,7 @@
     -   [signOut](#signOut)
     -   [getSignOutURL](#getSignOutURL)
     -   [getIDToken](#getIDToken)
+    -   [isAuthenticated](#isAuthenticated)
 -   [Data Storage](#data-storage)
     -   [Data Layer](#data-layer)
     [Models](#models)
