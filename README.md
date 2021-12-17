@@ -85,7 +85,7 @@ authClient.requestAccessToken(AUTHENTICATION_CODE, SESSION_STATE)
         console.log(response);
         // Note: Set a Cookie to send the session ID back to the client
         // If you are using Express JS, You may use something like this.
-         res.cookie('ASGARDEO_SESSION_ID',response.session, { maxAge: 900000, httpOnly: true });
+         res.cookie('ASGARDEO_SESSION_ID',response.session, { maxAge: 900000, httpOnly: true, SameSite: true });
     })
     .catch((error) => {
         console.error(error);
@@ -298,6 +298,28 @@ This method returns the id token.
 const idToken = await authClient.getIDToken("a2a2972c-51cd-5e9d-a9ae-058fae9f7927");
 ```
 
+---
+### isAuthenticated
+
+```TypeScript
+isAuthenticated(sessionId: string): Promise<boolean>
+```
+
+#### Returns
+
+isAuth: `boolean`
+A boolean value that indicates of the user is authenticated or not.
+
+#### Description
+
+This method returns a boolean value indicating if the user is authenticated or not.
+
+#### Example
+
+```TypeScript
+// This should be within an async function.
+const isAuth = await authClient.isAuthenticated("a2a2972c-51cd-5e9d-a9ae-058fae9f7927");
+```
 ---
 
 ## Data Storage

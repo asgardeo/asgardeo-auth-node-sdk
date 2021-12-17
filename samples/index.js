@@ -39,7 +39,7 @@ app.get("/authorize", (req, res) => {
     if (req.query.code) {
         authClient.requestAccessToken(req.query.code, req.query.session_state).then(response => {
             // console.log("token", response)
-            res.cookie('ASGARDEO_SESSION_ID', response.session, { maxAge: 900000, httpOnly: true });
+            res.cookie('ASGARDEO_SESSION_ID', response.session, { maxAge: 900000, httpOnly: true, SameSite: true });
             res.send(response)
         }).catch(err => {
             console.log(err)
@@ -53,6 +53,19 @@ app.get("/id", (req, res) => {
         res.send("Unauthenticated")
     } else {
         authClient.getIDToken(req.cookies.ASGARDEO_SESSION_ID).then(response => {
+            res.send(response)
+        }).catch(err => {
+            console.log(err)
+            res.send(err)
+        })
+    }
+});
+
+app.get("/isauth", (req, res) => {
+    if (req.cookies.ASGARDEO_SESSION_ID === undefined) {
+        res.send("Unauthenticated")
+    } else {
+        authClient.isAuthenticated(req.cookies.ASGARDEO_SESSION_ID).then(response => {
             res.send(response)
         }).catch(err => {
             console.log(err)

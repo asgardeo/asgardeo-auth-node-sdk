@@ -127,6 +127,32 @@ export class AsgardeoAuth<T>{
         }
     }
 
+    public async isAuthenticated(uuid: string): Promise<Boolean> {
+        try {
+            const existing_user_session = await this._sessionStore.getUserSession(uuid);
+            const isServerAuthenticated = Object.keys(existing_user_session).length === 0 ? false : true;
+
+            const isAsgardeoAuthenticated = await this._auth.isAuthenticated();
+
+            if (isAsgardeoAuthenticated && isAsgardeoAuthenticated) {
+                return Promise.resolve(true)
+            } else {
+                return Promise.resolve(false)
+            }
+        } catch (error) {
+            return Promise.reject(
+                new AsgardeoAuthException(
+                    "AUTH_CORE-RAT1-NF01", //TODO: Not sure
+                    "node-authentication",
+                    "getIDToken",
+                    "Requesting ID Token Failed",
+                    "No token endpoint was found in the OIDC provider meta data returned by the well-known endpoint " +
+                    "or the token endpoint passed to the SDK is empty."
+                )
+            )
+        }
+    }
+
 
     public async signOut(uuid: string): Promise<string> {
 
