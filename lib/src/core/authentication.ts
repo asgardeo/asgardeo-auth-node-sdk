@@ -50,7 +50,16 @@ export class AsgardeoAuth<T>{
         if (authURL) {
             return Promise.resolve(authURL.toString())
         } else {
-            return Promise.reject();
+            return Promise.reject(
+                new AsgardeoAuthException(
+                    "AUTH_CORE-RAT1-NF01", //TODO: Not sure
+                    "node-authentication",
+                    "getAuthURL",
+                    "Access token or decoded token failed.",
+                    "No token endpoint was found in the OIDC provider meta data returned by the well-known endpoint " +
+                    "or the token endpoint passed to the SDK is empty."
+                )
+            )
         }
 
     }
@@ -134,7 +143,7 @@ export class AsgardeoAuth<T>{
 
             const isAsgardeoAuthenticated = await this._auth.isAuthenticated();
 
-            if (isAsgardeoAuthenticated && isAsgardeoAuthenticated) {
+            if (isAsgardeoAuthenticated && isServerAuthenticated) {
                 return Promise.resolve(true);
             } else {
                 return Promise.resolve(false);
@@ -170,6 +179,7 @@ export class AsgardeoAuth<T>{
                 )
             )
         }
+        //DEBUG
         console.log(cache.keys());
         return Promise.resolve(signOutURL);
     }

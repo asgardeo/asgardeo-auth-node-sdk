@@ -74,6 +74,14 @@ app.get("/isauth", (req, res) => {
     }
 });
 
+app.get("/protected", (req,res) => {
+    if (req.cookies.ASGARDEO_SESSION_ID === undefined) {
+        res.send("Unauthenticated")
+    } else {
+        res.status(200).send("Protected Route")
+    }
+})
+
 app.get("/logout", (req, res) => {
     if (req.cookies.ASGARDEO_SESSION_ID === undefined) {
         res.send("Unauthenticated")
