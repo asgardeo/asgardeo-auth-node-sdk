@@ -63,18 +63,6 @@ const config = {
 // Instantiate the AsgardeoAuthClient and pass the config object as an argument into the constructor.
 const authClient = new AsgardeoAuth.AsgardeoAuth(config);
 
-// To get the authorization URL, simply call this method.
-authClient.getAuthorizationURL()
-    .then((url) => {
-        // Redirect the user to the authentication URL. If this is used with Express JS,
-        // you may want to do something like this after wrapping the getAuthorizationURL()
-        // method arond a route  :
-        res.redirect(url);
-    })
-    .catch((error) => {
-        console.error(error);
-    });
-
 //If you are using ExpressJS, you may try something like this.
 app.get("/login", (req, res) => {
     authClient.signIn(req.query.code, req.query.session_state).then(response => {
