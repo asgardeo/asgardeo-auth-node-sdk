@@ -22,39 +22,11 @@ import { MemoryCacheStore } from "../stores";
 import cache from 'memory-cache'; // Only for debugging
 import { UserSession } from '../session';
 
-/**
- * This class provides the necessary methods needed to implement authentication.
- *
- * @export
- * @class AsgardeoNodeClient
- */
-export class AsgardeoNodeClient<T>{
+export class AsgardeoNodeCore<T>{
 
     private _auth: AsgardeoAuthClient<T>;
     private _store: Store;
     private _sessionStore: UserSession;
-
-    /**
-     * This is the constructor method that returns an instance of the .
-     *
-     * @param {AuthClientConfig<T>} config - The configuration object.
-     * @param {Store} store - The store object.
-     *
-     * @example
-     * ```
-     * const _store: Store = new DataStore();
-     * const _config = {
-            signInRedirectURL: "http://localhost:3000/sign-in",
-            signOutRedirectURL: "http://localhost:3000/dashboard",
-            clientID: "client ID",
-            serverOrigin: "https://api.asgardeo.io/t/<org_name>"
-        };
-     * const auth = new AsgardeoNodeClient(_condfig,_store);
-     * ```
-     *
-     * @link https://github.com/asgardeo/asgardeo-auth-js-sdk/tree/master#constructor
-     * @preserve
-     */
 
     constructor(config: AuthClientConfig<T>, store?: Store) {
 
@@ -217,29 +189,7 @@ export class AsgardeoNodeClient<T>{
         }
     }
 
-
     public async signOut(uuid: string): Promise<string> {
-
-        const signOutURL = await this._auth.signOut();
-        const destroySession = await this._sessionStore.destroyUserSession(uuid);
-
-        if (!signOutURL || !destroySession) {
-            return Promise.reject(
-                new AsgardeoAuthException(
-                    "AUTH_CORE-RAT1-NF01", //TODO: Not sure
-                    "node-authentication",
-                    "signout",
-                    "Signing out the user failed.",
-                    "Could not obtain the signout URL from the server."
-                )
-            )
-        }
-        //DEBUG
-        console.log(cache.keys());
-        return Promise.resolve(signOutURL);
-    }
-
-    public async getSignoutURL(uuid: string): Promise<string> {
 
         const signOutURL = await this._auth.getSignOutURL();
         const destroySession = await this._sessionStore.destroyUserSession(uuid);

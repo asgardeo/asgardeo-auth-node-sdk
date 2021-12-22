@@ -6,6 +6,5 @@ const config = {
     "enableOIDCSessionManagement": true,
     "scope": ["openid", "profile"],
     "validateIDToken": true,
-    "runtimeEnvironment": "NODE",
 }
 module.exports = config;

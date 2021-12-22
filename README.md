@@ -17,7 +17,6 @@
   - [constructor](#constructor)
   - [signIn](#signIn)
   - [signOut](#signOut)
-  - [getSignOutURL](#getSignOutURL)
   - [getIDToken](#getIDToken)
   - [isAuthenticated](#isAuthenticated)
 - [Data Storage](#data-storage)
@@ -203,7 +202,7 @@ authClient.signIn(req.query.code, req.query.session_state).then(response => {
             res.cookie('ASGARDEO_SESSION_ID', response.session, { maxAge: 900000, httpOnly: true, SameSite: true });
             res.status(200).send(response)
         }
-    })
+    });
 ```
 
 ---
@@ -238,31 +237,6 @@ const signOutURL = await authClient.signOut("a2a2972c-51cd-5e9d-a9ae-058fae9f792
 
 ---
 
-### getSignOutURL
-
-```TypeScript
-getSignOutURL(sessionId: string): Promise<string>
-```
-
-#### Returns
-
-signOutURL: `Promise<string>`
-
-The user should be redirected to this URL in order to sign out of the server.
-
-#### Description
-
-This method returns the sign-out URL to which the user should be redirected to be signed out from the server. This is different to the [`signOut`](#signOut) method because **this doesn't clear the authentication data** from the store.
-
-#### Example
-
-```TypeScript
-// This should be within an async function.
-const signOutURL = await authClient.getSignOutURL("a2a2972c-51cd-5e9d-a9ae-058fae9f7927");
-```
-
----
-
 ### getIDToken
 
 ```TypeScript
@@ -272,7 +246,7 @@ getIDToken(sessionId: string): Promise<string>
 #### Returns
 
 idToken: `Promise<string>`
-The id token.
+A Promise that resolves with the ID Token.
 
 #### Description
 
