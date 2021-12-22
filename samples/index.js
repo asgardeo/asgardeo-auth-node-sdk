@@ -1,6 +1,6 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
-const AsgardeoAuth = require('@asgardeo/auth-nodejs-sdk');
+const AsgardeoNodeClient = require('@asgardeo/auth-nodejs-sdk')
 const config = require('./config');
 
 //Constants
@@ -10,8 +10,8 @@ const PORT = 5000;
 const app = express();
 app.use(cookieParser());
 
-//Initialize Asgardeo Auth
-const authClient = new AsgardeoAuth.AsgardeoAuth(config);
+//Initialize Asgardeo Auth Client
+const authClient =new AsgardeoNodeClient.AsgardeoNodeClient(config)
 
 
 //Routes
@@ -19,38 +19,27 @@ app.get("/", (req, res) => {
     res.send("Hello World")
 })
 
-
-
 app.get("/login", (req, res) => {
-    authClient.getAuthURL().then(url => {
-        console.log(url)
-        if (url) {
-            res.redirect(url)
+    authClient.signIn(req.query.code, req.query.session_state).then(response => {
+        if (response.hasOwnProperty('url')) {
+            res.redirect(response.url)
+            //You may alternatively use the status code upon redirecting
+            // Eg: res.status(response.redirect).redirect(response.url);
+        } else {
+            //Make sure you use the httpOnly and sameSite to prevent from cross-site request forgery (CSRF) attacks.
+            res.cookie('ASGARDEO_SESSION_ID', response.session, { maxAge: 900000, httpOnly: true, sameSite: true });
+            res.status(200).send(response)
         }
-    }).catch(err => {
-        console.log(err)
-        res.status(400).send({
-            "message": "Failed"
-        })
     })
 });
 
-app.get("/authorize", (req, res) => {
-    if (req.query.code) {
-        authClient.requestAccessToken(req.query.code, req.query.session_state).then(response => {
-            // console.log("token", response)
-            res.cookie('ASGARDEO_SESSION_ID', response.session, { maxAge: 900000, httpOnly: true, SameSite: true });
-            res.send(response)
-        }).catch(err => {
-            console.log(err)
-            res.send(err)
-        })
-    }
-});
 
 app.get("/id", (req, res) => {
+    //If the session cookie is not there in the request, it is not possible to get the session from the store. Hence, unauthenticated.
     if (req.cookies.ASGARDEO_SESSION_ID === undefined) {
         res.send("Unauthenticated")
+        //You may redirect the user to login endpoint here.
+        // res.status(301).redirect("/login");
     } else {
         authClient.getIDToken(req.cookies.ASGARDEO_SESSION_ID).then(response => {
             res.send(response)
@@ -74,6 +63,7 @@ app.get("/isauth", (req, res) => {
     }
 });
 
+//A sample protected route
 app.get("/protected", (req,res) => {
     if (req.cookies.ASGARDEO_SESSION_ID === undefined) {
         res.send("Unauthenticated")
@@ -86,7 +76,8 @@ app.get("/logout", (req, res) => {
     if (req.cookies.ASGARDEO_SESSION_ID === undefined) {
         res.send("Unauthenticated")
     } else {
-        authClient.getSignoutURL(req.cookies.ASGARDEO_SESSION_ID).then(response => {
+        authClient.signOut(req.cookies.ASGARDEO_SESSION_ID).then(response => {
+            //Invalidate the session cookie
             res.cookie('ASGARDEO_SESSION_ID', null, { maxAge: 0 });
             res.redirect(response)
         }).catch(err => {

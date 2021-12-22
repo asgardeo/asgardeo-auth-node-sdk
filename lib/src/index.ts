@@ -16,4 +16,4 @@
  * under the License.
  */
 
-export * from "./core/authentication";
+export * from "./client";

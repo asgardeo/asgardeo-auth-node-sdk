@@ -1,4 +1,4 @@
-# Asgardeo Auth JavaScript SDK
+# Asgardeo Auth NodeJS SDK
 
 ![Builder](https://github.com/asgardeo/asgardeo-auth-js-sdk/workflows/Builder/badge.svg)
 [![Stackoverflow](https://img.shields.io/badge/Ask%20for%20help%20on-Stackoverflow-orange)](https://stackoverflow.com/questions/tagged/wso2is)
@@ -10,27 +10,25 @@
 
 ## Table of Content
 
--   [Introduction](#introduction)
--   [Install](#install)
--   [Getting Started](#getting-started)
--   [APIs](#apis)
-    -   [constructor](#constructor)
-    -   [initialize](#initialize)
-    -   [getAuthorizationURL](#getAuthorizationURL)
-    -   [requestAccessToken](#requestAccessToken)
-    -   [signOut](#signOut)
-    -   [getSignOutURL](#getSignOutURL)
-    -   [getIDToken](#getIDToken)
-    -   [isAuthenticated](#isAuthenticated)
--   [Data Storage](#data-storage)
-    -   [Data Layer](#data-layer)
+- [Introduction](#introduction)
+- [Install](#install)
+- [Getting Started](#getting-started)
+- [APIs](#apis)
+  - [constructor](#constructor)
+  - [signIn](#signIn)
+  - [signOut](#signOut)
+  - [getIDToken](#getIDToken)
+  - [isAuthenticated](#isAuthenticated)
+- [Data Storage](#data-storage)
+  - [Data Layer](#data-layer)
     [Models](#models)
-    -   [AuthClientConfig\<T>](#AuthClientConfigT)
-    -   [Store](#Store)
-    -   [NodeTokenResponse](#NodeTokenResponse)
--   [Develop](#develop)
--   [Contribute](#contribute)
--   [License](#license)
+  - [AuthClientConfig\<T>](#AuthClientConfigT)
+  - [Store](#Store)
+  - [NodeTokenResponse](#NodeTokenResponse)
+  - [URLResponse](#URLResponse)
+- [Develop](#develop)
+- [Contribute](#contribute)
+- [License](#license)
 
 ## Introduction
 
@@ -48,7 +46,6 @@ Install the library from the npm registry.
 npm install @asgardeo/auth-nodejs-sdk
 ```
 
-
 ## Getting Started
 
 ```javascript
@@ -58,7 +55,7 @@ const AsgardeoAuth = require('@asgardeo/auth-nodejs-sdk');
 // Create a config object containing the necessary configurations.
 const config = {
     signInRedirectURL: "http://localhost:3000/sign-in",
-    signOutRedirectURL: "http://localhost:3000/dashboard",
+    signOutRedirectURL: "http://localhost:3000/login",
     clientID: "client ID",
     serverOrigin: "https://api.asgardeo.io/t/<org_name>"
 };
@@ -78,19 +75,23 @@ authClient.getAuthorizationURL()
         console.error(error);
     });
 
-// Once you obtain the authentication code and the session state from the server, you can use this method
-// to get the access token.
-authClient.requestAccessToken(AUTHENTICATION_CODE, SESSION_STATE)
-    .then((response) => {
-        // Obtain the token and other related from the response;
-        console.log(response);
-        // Note: Set a Cookie to send the session ID back to the client
-        // If you are using Express JS, You may use something like this.
-         res.cookie('ASGARDEO_SESSION_ID',response.session, { maxAge: 900000, httpOnly: true, SameSite: true });
-    })
-    .catch((error) => {
+//If you are using ExpressJS, you may try something like this.
+app.get("/login", (req, res) => {
+    authClient.signIn(req.query.code, req.query.session_state).then(response => {
+        //url property will available if the user needs to be authenticated
+        if (response.hasOwnProperty('url')) {
+            res.redirect(response.url)
+        } else {
+            //If the user is already authenticated, it will return the access token.
+            //Set the cookie to maintain the session
+            res.cookie('ASGARDEO_SESSION_ID', response.session, { maxAge: 900000, httpOnly: true, SameSite: true });
+            res.status(200).send(response)
+        }
+    })catch((error) => {
         console.error(error);
     });
+});
+
 ```
 
 ## APIs
@@ -105,122 +106,103 @@ new AsgardeoAuth(config:AuthClientConfig<T>, store?: Store);
 ```
 
 #### Arguments
+
 1. config: [`AuthClientConfig<T>`](#AuthClientConfigT)
 
-    This contains the configuration information needed to implement authentication such as the client ID, server origin etc. Additional configuration information that is needed to be stored can be passed by extending the type of this argument using the generic type parameter. For example, if you want the config to have an attribute called `foo`, you can create an interface called `Bar` in TypeScript and then pass that interface as the generic type to `AuthClientConfig` interface. To learn more about what attributes can be passed into this object, refer to the [`AuthClientConfig<T>`](#AuthClientConfigT) section.
+   This contains the configuration information needed to implement authentication such as the client ID, server origin etc. Additional configuration information that is needed to be stored can be passed by extending the type of this argument using the generic type parameter. For example, if you want the config to have an attribute called `foo`, you can create an interface called `Bar` in TypeScript and then pass that interface as the generic type to `AuthClientConfig` interface. To learn more about what attributes can be passed into this object, refer to the [`AuthClientConfig<T>`](#AuthClientConfigT) section.
 
-    ```TypeScript
-    interface Bar {
-        foo: string
-    }
+   ```TypeScript
+   interface Bar {
+       foo: string
+   }
 
-    const auth = new AsgardeoAuthClient(config: AuthClientConfig<Bar>);
-    }
-    ```
+   const auth = new AsgardeoAuthClient(config: AuthClientConfig<Bar>);
+   }
+   ```
 
-    #### Example
-    ```TypeScript
-    const config = {
-        signInRedirectURL: "http://localhost:3000/sign-in",
-        signOutRedirectURL: "http://localhost:3000/dashboard",
-        clientID: "client ID",
-        serverOrigin: "https://api.asgardeo.io/t/<org_name>"
-    };
-    ```
+   #### Example
+
+   ```TypeScript
+   const config = {
+       signInRedirectURL: "http://localhost:3000/sign-in",
+       signOutRedirectURL: "http://localhost:3000/login",
+       clientID: "client ID",
+       serverOrigin: "https://api.asgardeo.io/t/<org_name>"
+   };
+   ```
 
 2. store: [`Store`](#Store)
 
-    This is the object of interface [`Store`](#Store) that is used by the SDK to store all the necessary data used ranging from the configuration data to the access token. By default, the SDK is packed with a built-in Memory Cache Store.  If needed, you can implement the Store to create a class with your own implementation logic and pass an instance of the class as the second argument. This way, you will be able to get the data stored in your preferred place. To know more about implementing the [`Store`](#Store) interface, refer to the [Data Storage](#data-storage) section.
+   This is the object of interface [`Store`](#Store) that is used by the SDK to store all the necessary data used ranging from the configuration data to the access token. By default, the SDK is packed with a built-in Memory Cache Store. If needed, you can implement the Store to create a class with your own implementation logic and pass an instance of the class as the second argument. This way, you will be able to get the data stored in your preferred place. To know more about implementing the [`Store`](#Store) interface, refer to the [Data Storage](#data-storage) section.
 
-    #### Description
+   #### Description
 
-    This creates an instance of the `AsgardeoAuthClient` class and returns it.
+   This creates an instance of the `AsgardeoAuthClient` class and returns it.
 
-    #### Example
+   #### Example
 
-    ```TypeScript
-    class NodeStore implements Store {
-        public async setData(key: string, value: string): void {
-            yourCustomStorage.setItem(key, value);
-        }
+   ```TypeScript
+   class NodeStore implements Store {
+       public async setData(key: string, value: string): void {
+           yourCustomStorage.setItem(key, value);
+       }
 
-        public async getData(key: string): string {
-            return yourCustomStorage.getItem(key);
-        }
+       public async getData(key: string): string {
+           return yourCustomStorage.getItem(key);
+       }
 
-        public async removeData(key: string): void {
-            yourCustomStorage.removeItem(key);
-        }
-    }
+       public async removeData(key: string): void {
+           yourCustomStorage.removeItem(key);
+       }
+   }
 
-    const store = new NodeStore();
+   const store = new NodeStore();
 
-    const auth = new AsgardeoAuthClient(config: AuthClientConfig<Bar>, store: store);
-    ```
-
-
----
-
-### getAuthURL
-
-```Typescript
-getAuthURL(): Promise<string>
-```
-
-#### Returns
-
-A Promise that resolves with the authorization URL
-
-#### Description
-
-This method returns a Promise that resolves with the authorization URL. The user can be redirected to this URL to authenticate themselves and authorize the client.
-
-#### Example (Express JS)
-
-```Typescript
-authClient.getAuthURL().then((url)=>{
-    res.redirect(url)
-}).catch((error)=>{
-    console.error(error);
-});
-```
+   const auth = new AsgardeoAuthClient(config: AuthClientConfig<Bar>, store: store);
+   ```
 
 ---
 
-### requestAccessToken
+### signIn
 
-```TypeScript
-requestAccessToken(authorizationCode: string, sessionState: string): Promise<NodeTokenResponse>
+```Typescript
+signIn(authorizationCode?: string, sessionState?: string): Promise<URLResponse | NodeTokenResponse>
 ```
 
 #### Arguments
 
-1. authorizationCode: `string`
+1. authorizationCode: `string` (optional)
 
-    This is the authorization code obtained from Asgardeo after a user signs in.
+   This is the authorization code obtained from Asgardeo after a user signs in.
 
-2. sessionState: `string`
+2. sessionState: `string` (optional)
 
-    This is the session state obtained from Asgardeo after a user signs in.
+   This is the session state obtained from Asgardeo after a user signs in.
 
 #### Returns
 
-A Promise that resolves with the [`NodeTokenResponse`](#NodeTokenResponse) object.
-
-The object contains data returned by the token response such as the access token, id token, refresh token, etc. You can learn more about the data returned from the [`NodeTokenResponse`](#NodeTokenResponse) section.
+A Promise that resolves with the [`URLResponse`](#URLResponse) object or a Promise that resolves with the [`NodeTokenResponse`](#NodeTokenResponse) object.
 
 #### Description
 
-This method uses the authorization code and the session state that are passed as arguments to send a request to the `token` endpoint to obtain the access token and the id token. If the user already has a session, it will obtain the existing session ID and if not, it will create a new session and obtain the session ID. The sign-in functionality can be implemented by calling the [`getAuthURL`](#getAuthURL) method followed by this method.
+This method first checks if the `authorizationCode` or `sessionState` is available in the arguments. If they exists, It will request the access token for the respective authorization code and returns a promise that will be resolved with the [`NodeTokenResponse`](#NodeTokenResponse) object.
+If not, it will obtain the authorization URL and returns a Promise that resolves with the [`URLResponse`](#URLResponse) object. The user can be redirected to this URL to authenticate themselves and authorize the client.
 
-#### Example
+_Note: Make sure you call the same `signIn()` method in the `signInRedirectURL` path to request the access token successfully._
 
-```TypeScript
-authClient.requestAccessToken("auth-code", "session-state").then((tokenResponse)=>{
-    console.log(tokenResponse);
-}).catch((error)=>{
-    console.error(error);
-});
+#### Example (Express JS)
+
+```Typescript
+authClient.signIn(req.query.code, req.query.session_state).then(response => {
+        //URL property will available if the user has not been authenticated already
+        if (response.hasOwnProperty('url')) {
+            res.redirect(response.url)
+        } else {
+            //Set the cookie
+            res.cookie('ASGARDEO_SESSION_ID', response.session, { maxAge: 900000, httpOnly: true, SameSite: true });
+            res.status(200).send(response)
+        }
+    });
 ```
 
 ---
@@ -239,9 +221,10 @@ The user should be redirected to this URL in order to sign out of the server.
 
 #### Description
 
-This clears the authentication data from the store, generates the sign-out URL and returns it. This should be used only if you want to sign out the user from the Asgardeo as well. 
+This clears the authentication data from the store, generates the sign-out URL and returns it. This should be used only if you want to sign out the user from the Asgardeo as well.
 
 #### Example
+
 _Note: Make sure to invalidate the cookie ID when sending the response to the client_
 
 ```TypeScript
@@ -254,30 +237,6 @@ const signOutURL = await authClient.signOut("a2a2972c-51cd-5e9d-a9ae-058fae9f792
 
 ---
 
-### getSignOutURL
-
-```TypeScript
-getSignOutURL(sessionId: string): Promise<string>
-```
-
-#### Returns
-
-signOutURL: `Promise<string>`
-
-The user should be redirected to this URL in order to sign out of the server.
-
-#### Description
-
-This method returns the sign-out URL to which the user should be redirected to be signed out from the server. This is different to the [`signOut`](#signOut) method because **this doesn't clear the authentication data** from the store.
-
-#### Example
-
-```TypeScript
-// This should be within an async function.
-const signOutURL = await authClient.getSignOutURL("a2a2972c-51cd-5e9d-a9ae-058fae9f7927");
-```
-
----
 ### getIDToken
 
 ```TypeScript
@@ -287,7 +246,7 @@ getIDToken(sessionId: string): Promise<string>
 #### Returns
 
 idToken: `Promise<string>`
-The id token.
+A Promise that resolves with the ID Token.
 
 #### Description
 
@@ -300,6 +259,7 @@ const idToken = await authClient.getIDToken("a2a2972c-51cd-5e9d-a9ae-058fae9f792
 ```
 
 ---
+
 ### isAuthenticated
 
 ```TypeScript
@@ -321,6 +281,7 @@ This method returns a boolean value indicating if the user is authenticated or n
 // This should be within an async function.
 const isAuth = await authClient.isAuthenticated("a2a2972c-51cd-5e9d-a9ae-058fae9f7927");
 ```
+
 ---
 
 ## Data Storage
@@ -349,8 +310,10 @@ class NodeStore implements Store {
         sessionStorage.removeItem(key);
     }
 }
-``` 
+```
+
 ---
+
 ## Models
 
 ### AuthClientConfig\<T>
@@ -393,8 +356,7 @@ const config: AuthClientConfig<Bar> ={
 | ------------ | ----------------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | `setData`    | Required          | key: `string`, value: `string` | `Promise<void>`                                                                                                                                                                 | This method saves the passed value to the store. The data to be saved is JSON stringified so will be passed by the SDK as a string. |
 | `getData`    | Required          | key: `string`\|`string`        | This method retrieves the data from the store and returns a Promise that resolves with it. Since the SDK stores the data as a JSON string, the returned value will be a string. |
-| `removeData` | Required          | key: `string`                  | `Promise<void>`                                                                                                                                                                 | Removes the data with the specified key from the store.        
-
+| `removeData` | Required          | key: `string`                  | `Promise<void>`                                                                                                                                                                 | Removes the data with the specified key from the store.                                                                             |
 
 ### NodeTokenResponse
 
@@ -408,14 +370,21 @@ const config: AuthClientConfig<Bar> ={
 | `tokenType`    | `string` | The token type.             |
 | `session`      | `string` | The session ID.             |
 
+### URLResponse
+
+| Method     | Type     | Description                      |
+| ---------- | -------- | -------------------------------- |
+| `url`      | `string` | The redirection URL for Sign In. |
+| `redirect` | `number` | Redirection status.              |
+
 ---
 
 ## Develop
 
 ### Prerequisites
 
--   `Node.js` (version 10 or above).
--   `npm` package manager.
+- `Node.js` (version 10 or above).
+- `npm` package manager.
 
 ### Installing Dependencies
 

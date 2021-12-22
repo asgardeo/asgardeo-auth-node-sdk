@@ -17,18 +17,17 @@
  */
 import { AsgardeoAuthClient, AuthClientConfig, Store } from "@asgardeo/auth-js";
 import { AsgardeoAuthException } from "../exception";
-import { NodeTokenResponse } from '../models';
+import { NodeTokenResponse, URLResponse } from '../models';
 import { MemoryCacheStore } from "../stores";
 import cache from 'memory-cache'; // Only for debugging
 import { UserSession } from '../session';
 
-export class AsgardeoAuth<T>{
+export class AsgardeoNodeCore<T>{
 
     private _auth: AsgardeoAuthClient<T>;
     private _store: Store;
     private _sessionStore: UserSession;
 
-    //TODO: Add the type here
     constructor(config: AuthClientConfig<T>, store?: Store) {
 
         //Initialize the default memory cache store if an external store is not passed.
@@ -41,6 +40,35 @@ export class AsgardeoAuth<T>{
         this._auth = new AsgardeoAuthClient(this._store);
         this._sessionStore = new UserSession(this._store);
         this._auth.initialize(config);
+    }
+
+    public async signIn(authorizationCode?: string, sessionState?: string): Promise<URLResponse | NodeTokenResponse> {
+
+        //Check if the authorization code or session state is there
+        //If so, generate the access token, otherwise generate the auth URL
+        if (!authorizationCode || !sessionState) {
+            const authURL = await this.getAuthURL();
+            return Promise.resolve({
+                url: authURL,
+                redirect: 302 // https code 302 - Found (Moved temporarily)
+            });
+        } else {
+            const tokenResponse = await this.requestAccessToken(authorizationCode, sessionState);
+            if (tokenResponse) {
+                return Promise.resolve(tokenResponse);
+            }
+        }
+
+        return Promise.reject(
+            new AsgardeoAuthException(
+                "AUTH_CORE-RAT1-NF01", //TODO: Not sure
+                "node-authentication",
+                "signIn",
+                "Access token or decoded token failed.",
+                "No token endpoint was found in the OIDC provider meta data returned by the well-known endpoint " +
+                "or the token endpoint passed to the SDK is empty."
+            )
+        );
     }
 
     public async getAuthURL(): Promise<string> {
@@ -61,7 +89,6 @@ export class AsgardeoAuth<T>{
                 )
             )
         }
-
     }
 
     public async requestAccessToken(authorizationCode: string, sessionState: string): Promise<NodeTokenResponse> {
@@ -162,29 +189,7 @@ export class AsgardeoAuth<T>{
         }
     }
 
-
     public async signOut(uuid: string): Promise<string> {
-
-        const signOutURL = await this._auth.signOut();
-        const destroySession = await this._sessionStore.destroyUserSession(uuid);
-
-        if (!signOutURL || !destroySession) {
-            return Promise.reject(
-                new AsgardeoAuthException(
-                    "AUTH_CORE-RAT1-NF01", //TODO: Not sure
-                    "node-authentication",
-                    "signout",
-                    "Signing out the user failed.",
-                    "Could not obtain the signout URL from the server."
-                )
-            )
-        }
-        //DEBUG
-        console.log(cache.keys());
-        return Promise.resolve(signOutURL);
-    }
-
-    public async getSignoutURL(uuid: string): Promise<string> {
 
         const signOutURL = await this._auth.getSignOutURL();
         const destroySession = await this._sessionStore.destroyUserSession(uuid);
