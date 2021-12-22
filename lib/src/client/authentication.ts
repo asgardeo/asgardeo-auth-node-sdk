@@ -55,6 +55,7 @@ export class AsgardeoNodeClient<T>{
      * @link https://github.com/asgardeo/asgardeo-auth-js-sdk/tree/master#constructor
      * @preserve
      */
+
     constructor(config: AuthClientConfig<T>, store?: Store) {
 
         //Initialize the default memory cache store if an external store is not passed.
@@ -77,7 +78,7 @@ export class AsgardeoNodeClient<T>{
             const authURL = await this.getAuthURL();
             return Promise.resolve({
                 url: authURL,
-                redirect: true
+                redirect: 302 // https code 302 - Found (Moved temporarily)
             });
         } else {
             const tokenResponse = await this.requestAccessToken(authorizationCode, sessionState);
