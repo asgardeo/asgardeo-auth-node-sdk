@@ -11,7 +11,7 @@ const app = express();
 app.use(cookieParser());
 
 //Initialize Asgardeo Auth
-const authClient = new AsgardeoAuth.AsgardeoAuth(config);
+const authClient = new AsgardeoAuth.AsgardeoNodeClient(config);
 
 
 //Routes
@@ -19,19 +19,14 @@ app.get("/", (req, res) => {
     res.send("Hello World")
 })
 
-
-
 app.get("/login", (req, res) => {
-    authClient.getAuthURL().then(url => {
-        console.log(url)
-        if (url) {
-            res.redirect(url)
+    authClient.signIn(req.query.code, req.query.session_state).then(response => {
+        if (response.hasOwnProperty('url')) {
+            res.redirect(response.url)
+        } else {
+            res.cookie('ASGARDEO_SESSION_ID', response.session, { maxAge: 900000, httpOnly: true, SameSite: true });
+            res.status(200).send(response)
         }
-    }).catch(err => {
-        console.log(err)
-        res.status(400).send({
-            "message": "Failed"
-        })
     })
 });
 

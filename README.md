@@ -1,4 +1,4 @@
-# Asgardeo Auth JavaScript SDK
+# Asgardeo Auth NodeJS SDK
 
 ![Builder](https://github.com/asgardeo/asgardeo-auth-js-sdk/workflows/Builder/badge.svg)
 [![Stackoverflow](https://img.shields.io/badge/Ask%20for%20help%20on-Stackoverflow-orange)](https://stackoverflow.com/questions/tagged/wso2is)
@@ -15,7 +15,7 @@
 -   [Getting Started](#getting-started)
 -   [APIs](#apis)
     -   [constructor](#constructor)
-    -   [initialize](#initialize)
+    -   [signIn](#signIn)
     -   [getAuthorizationURL](#getAuthorizationURL)
     -   [requestAccessToken](#requestAccessToken)
     -   [signOut](#signOut)
@@ -28,6 +28,7 @@
     -   [AuthClientConfig\<T>](#AuthClientConfigT)
     -   [Store](#Store)
     -   [NodeTokenResponse](#NodeTokenResponse)
+    -   [URLResponse](#URLResponse)
 -   [Develop](#develop)
 -   [Contribute](#contribute)
 -   [License](#license)
@@ -157,6 +158,46 @@ new AsgardeoAuth(config:AuthClientConfig<T>, store?: Store);
 
     const auth = new AsgardeoAuthClient(config: AuthClientConfig<Bar>, store: store);
     ```
+
+
+---
+
+### signIn
+
+```Typescript
+signIn(authorizationCode?: string, sessionState?: string): Promise<URLResponse | NodeTokenResponse>
+```
+#### Arguments
+
+1. authorizationCode: `string`  (optional)
+
+    This is the authorization code obtained from Asgardeo after a user signs in.
+
+2. sessionState: `string`  (optional)
+
+    This is the session state obtained from Asgardeo after a user signs in.
+
+#### Returns
+
+A Promise that resolves with the  [`URLResponse`](#URLResponse) object or a Promise that resolves with the [`NodeTokenResponse`](#NodeTokenResponse) object.
+
+#### Description
+
+This method first checks if the `authorizationCode` or `sessionState` is available in the arguments. If they exists, It returns a promise that will be resolved with the [`NodeTokenResponse`](#NodeTokenResponse) object.
+If not, it returns a Promise that resolves with the [`URLResponse`](#URLResponse) object, which contains the authorization URL. The user can be redirected to this URL to authenticate themselves and authorize the client.
+
+#### Example (Express JS) 
+
+```Typescript
+authClient.signIn(req.query.code, req.query.session_state).then(response => {
+        if (response.hasOwnProperty('url')) {
+            res.redirect(response.url)
+        } else {
+            res.cookie('ASGARDEO_SESSION_ID', response.session, { maxAge: 900000, httpOnly: true, SameSite: true });
+            res.status(200).send(response)
+        }
+    })
+```
 
 
 ---
@@ -393,7 +434,7 @@ const config: AuthClientConfig<Bar> ={
 | ------------ | ----------------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | `setData`    | Required          | key: `string`, value: `string` | `Promise<void>`                                                                                                                                                                 | This method saves the passed value to the store. The data to be saved is JSON stringified so will be passed by the SDK as a string. |
 | `getData`    | Required          | key: `string`\|`string`        | This method retrieves the data from the store and returns a Promise that resolves with it. Since the SDK stores the data as a JSON string, the returned value will be a string. |
-| `removeData` | Required          | key: `string`                  | `Promise<void>`                                                                                                                                                                 | Removes the data with the specified key from the store.        
+| `removeData` | Required          | key: `string`                  | `Promise<void>`                                                                                                                                                                 | Removes the data with the specified key from the store.                                                                             |
 
 
 ### NodeTokenResponse
@@ -407,6 +448,13 @@ const config: AuthClientConfig<Bar> ={
 | `refreshToken` | `string` | The refresh token.          |
 | `tokenType`    | `string` | The token type.             |
 | `session`      | `string` | The session ID.             |
+
+### URLResponse
+
+| Method         | Type     | Description                 |
+| -------------- | -------- | --------------------------- |
+| `url`  | `string` | The redirection URL for Sign In.    |
+| `redirect`      | `Boolean` | Redirection status.       |
 
 ---
 

@@ -17,18 +17,44 @@
  */
 import { AsgardeoAuthClient, AuthClientConfig, Store } from "@asgardeo/auth-js";
 import { AsgardeoAuthException } from "../exception";
-import { NodeTokenResponse } from '../models';
+import { NodeTokenResponse, URLResponse } from '../models';
 import { MemoryCacheStore } from "../stores";
 import cache from 'memory-cache'; // Only for debugging
 import { UserSession } from '../session';
 
-export class AsgardeoAuth<T>{
+/**
+ * This class provides the necessary methods needed to implement authentication.
+ *
+ * @export
+ * @class AsgardeoNodeClient
+ */
+export class AsgardeoNodeClient<T>{
 
     private _auth: AsgardeoAuthClient<T>;
     private _store: Store;
     private _sessionStore: UserSession;
 
-    //TODO: Add the type here
+    /**
+     * This is the constructor method that returns an instance of the .
+     *
+     * @param {AuthClientConfig<T>} config - The configuration object.
+     * @param {Store} store - The store object.
+     *
+     * @example
+     * ```
+     * const _store: Store = new DataStore();
+     * const _config = {
+            signInRedirectURL: "http://localhost:3000/sign-in",
+            signOutRedirectURL: "http://localhost:3000/dashboard",
+            clientID: "client ID",
+            serverOrigin: "https://api.asgardeo.io/t/<org_name>"
+        };
+     * const auth = new AsgardeoNodeClient(_condfig,_store);
+     * ```
+     *
+     * @link https://github.com/asgardeo/asgardeo-auth-js-sdk/tree/master#constructor
+     * @preserve
+     */
     constructor(config: AuthClientConfig<T>, store?: Store) {
 
         //Initialize the default memory cache store if an external store is not passed.
@@ -41,6 +67,35 @@ export class AsgardeoAuth<T>{
         this._auth = new AsgardeoAuthClient(this._store);
         this._sessionStore = new UserSession(this._store);
         this._auth.initialize(config);
+    }
+
+    public async signIn(authorizationCode?: string, sessionState?: string): Promise<URLResponse | NodeTokenResponse> {
+
+        //Check if the authorization code or session state is there
+        //If so, generate the access token, otherwise generate the auth URL
+        if (!authorizationCode || !sessionState) {
+            const authURL = await this.getAuthURL();
+            return Promise.resolve({
+                url: authURL,
+                redirect: true
+            });
+        } else {
+            const tokenResponse = await this.requestAccessToken(authorizationCode, sessionState);
+            if (tokenResponse) {
+                return Promise.resolve(tokenResponse);
+            }
+        }
+
+        return Promise.reject(
+            new AsgardeoAuthException(
+                "AUTH_CORE-RAT1-NF01", //TODO: Not sure
+                "node-authentication",
+                "signIn",
+                "Access token or decoded token failed.",
+                "No token endpoint was found in the OIDC provider meta data returned by the well-known endpoint " +
+                "or the token endpoint passed to the SDK is empty."
+            )
+        );
     }
 
     public async getAuthURL(): Promise<string> {
@@ -61,7 +116,6 @@ export class AsgardeoAuth<T>{
                 )
             )
         }
-
     }
 
     public async requestAccessToken(authorizationCode: string, sessionState: string): Promise<NodeTokenResponse> {
