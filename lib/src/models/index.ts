@@ -16,4 +16,4 @@
  * under the License.
  */
 export * from "./token-response";
-export * from "./url-response";
+export * from "./url-callback";

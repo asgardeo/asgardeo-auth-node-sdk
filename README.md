@@ -50,7 +50,7 @@ npm install @asgardeo/auth-nodejs-sdk
 
 ```javascript
 // The SDK provides a client that can be used to carry out the authentication.
-const AsgardeoAuth = require('@asgardeo/auth-nodejs-sdk');
+const { AsgardeoAuth } = require('@asgardeo/auth-nodejs-sdk');
 
 // Create a config object containing the necessary configurations.
 const config = {
@@ -61,7 +61,7 @@ const config = {
 };
 
 // Instantiate the AsgardeoAuthClient and pass the config object as an argument into the constructor.
-const authClient = new AsgardeoAuth.AsgardeoAuth(config);
+const authClient = new AsgardeoAuth(config);
 
 //If you are using ExpressJS, you may try something like this.
 app.get("/login", (req, res) => {
@@ -154,12 +154,16 @@ new AsgardeoAuth(config:AuthClientConfig<T>, store?: Store);
 ### signIn
 
 ```Typescript
-signIn(authorizationCode?: string, sessionState?: string): Promise<URLResponse | NodeTokenResponse>
+signIn(authURLCallback: AuthURLCallback, authorizationCode?: string, sessionState?: string): Promise<URLResponse | NodeTokenResponse>
 ```
 
 #### Arguments
 
-1. authorizationCode: `string` (optional)
+1. authURLCallback: `AuthURLCallback`
+
+   This is the callback function which is used to redirect the user to the authorization URL.
+
+2. authorizationCode: `string` (optional)
 
    This is the authorization code obtained from Asgardeo after a user signs in.
 
@@ -169,12 +173,12 @@ signIn(authorizationCode?: string, sessionState?: string): Promise<URLResponse |
 
 #### Returns
 
-A Promise that resolves with the [`URLResponse`](#URLResponse) object or a Promise that resolves with the [`NodeTokenResponse`](#NodeTokenResponse) object.
+A Promise that resolves with a Promise that resolves with the [`NodeTokenResponse`](#NodeTokenResponse) object.
 
 #### Description
 
 This method first checks if the `authorizationCode` or `sessionState` is available in the arguments. If they exists, It will request the access token for the respective authorization code and returns a promise that will be resolved with the [`NodeTokenResponse`](#NodeTokenResponse) object.
-If not, it will obtain the authorization URL and returns a Promise that resolves with the [`URLResponse`](#URLResponse) object. The user can be redirected to this URL to authenticate themselves and authorize the client.
+If not, it will obtain the authorization URL and callback the `authURLCallback` function with the authorization URL. The user can be redirected to this URL to authenticate themselves and authorize the client.
 
 _Note: Make sure you call the same `signIn()` method in the `signInRedirectURL` path to request the access token successfully._
 
@@ -358,12 +362,23 @@ const config: AuthClientConfig<Bar> ={
 | `tokenType`    | `string` | The token type.             |
 | `session`      | `string` | The session ID.             |
 
-### URLResponse
+### AuthURLCallback
 
-| Method     | Type     | Description                      |
-| ---------- | -------- | -------------------------------- |
-| `url`      | `string` | The redirection URL for Sign In. |
-| `redirect` | `number` | Redirection status.              |
+```TypeScript
+(url: string): void;
+```
+
+#### Description
+
+This method is used to handle the callback from the [`signIn`](#signIn) method. You may use this function to get the authorization URL and redirect the user to authorize the application.
+
+#### Example
+```TypeScript
+//You may use this in Express JS
+const urlCallbackHandler = (url: string): void => {
+    res.redirect(url);
+}
+```
 
 ---
 

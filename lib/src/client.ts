@@ -16,9 +16,8 @@
  * under the License.
  */
 import { AuthClientConfig, Store } from "@asgardeo/auth-js";
-import { AsgardeoNodeCore } from "../core"
-import { NodeTokenResponse, URLResponse } from "../models";
-
+import { AsgardeoNodeCore } from "./core"
+import { AuthURLCallback, NodeTokenResponse } from "./models";
 
 /**
  * This class provides the necessary methods needed to implement authentication.
@@ -82,8 +81,8 @@ export class AsgardeoNodeClient<T>{
      * @memberof AsgardeoNodeClient
      *
     */
-    public async signIn(authorizationCode?: string, sessionState?: string): Promise<URLResponse | NodeTokenResponse> {
-        return this._authCore.signIn(authorizationCode, sessionState);
+    public async signIn(authURLCallback: AuthURLCallback, authorizationCode?: string, sessionState?: string): Promise<NodeTokenResponse> {
+        return this._authCore.signIn(authURLCallback, authorizationCode, sessionState);
     }
 
 

@@ -15,16 +15,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { AsgardeoAuthClient, AuthClientConfig, Store } from "@asgardeo/auth-js";
+import { AsgardeoAuthClient, AuthClientConfig, Store, CryptoUtils } from "@asgardeo/auth-js";
 import { AsgardeoAuthException } from "../exception";
-import { NodeTokenResponse, URLResponse } from '../models';
+import { NodeTokenResponse, AuthURLCallback } from '../models';
 import { MemoryCacheStore } from "../stores";
 import cache from 'memory-cache'; // Only for debugging
 import { UserSession } from '../session';
+import { NodeCryptoUtils } from "../utils/crypto-utils";
 
 export class AsgardeoNodeCore<T>{
 
     private _auth: AsgardeoAuthClient<T>;
+    private _cryptoUtils: CryptoUtils;
     private _store: Store;
     private _sessionStore: UserSession;
 
@@ -36,29 +38,36 @@ export class AsgardeoNodeCore<T>{
         } else {
             this._store = store;
         }
-
-        this._auth = new AsgardeoAuthClient(this._store);
+        this._cryptoUtils = new NodeCryptoUtils();
+        this._auth = new AsgardeoAuthClient(this._store, this._cryptoUtils);
         this._sessionStore = new UserSession(this._store);
         this._auth.initialize(config);
     }
 
-    public async signIn(authorizationCode?: string, sessionState?: string): Promise<URLResponse | NodeTokenResponse> {
+    public async signIn(authURLCallback: AuthURLCallback, authorizationCode?: string, sessionState?: string): Promise<NodeTokenResponse> {
 
-        //Check if the authorization code or session state is there
-        //If so, generate the access token, otherwise generate the auth URL
+        //Check if the authorization code or session state is there.
+        //If so, generate the access token, otherwise generate the auth URL and return with callback function.
+
         if (!authorizationCode || !sessionState) {
             const authURL = await this.getAuthURL();
+            authURLCallback(authURL);
             return Promise.resolve({
-                url: authURL,
-                redirect: 302 // https code 302 - Found (Moved temporarily)
-            });
+                accessToken: "",
+                idToken: "",
+                expiresIn: "",
+                scope: "",
+                refreshToken: "",
+                tokenType: "",
+                session: ""
+            })
         } else {
             const tokenResponse = await this.requestAccessToken(authorizationCode, sessionState);
             if (tokenResponse) {
                 return Promise.resolve(tokenResponse);
             }
         }
-
+       
         return Promise.reject(
             new AsgardeoAuthException(
                 "AUTH_CORE-RAT1-NF01", //TODO: Not sure
