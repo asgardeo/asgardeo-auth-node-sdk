@@ -65,15 +65,18 @@ const authClient = new AsgardeoAuth(config);
 
 //If you are using ExpressJS, you may try something like this.
 app.get("/login", (req, res) => {
-    authClient.signIn(req.query.code, req.query.session_state).then(response => {
-        //url property will available if the user needs to be authenticated
-        if (response.hasOwnProperty('url')) {
-            res.redirect(response.url)
-        } else {
+    const redirectCallback = (url) => {
+        if (url) {
+            res.redirect(url);
+            return;
+        }
+    }
+    authClient.signIn(redirectCallback, req.query.code, req.query.session_state).then(response => {
+        if (response.session) {
             //If the user is already authenticated, it will return the access token.
             //Set the cookie to maintain the session
-            res.cookie('ASGARDEO_SESSION_ID', response.session, { maxAge: 900000, httpOnly: true, SameSite: true });
-            res.status(200).send(response)
+            res.cookie('ASGARDEO_SESSION_ID', response.session, { maxAge: 900000, httpOnly: true, sameSite: true });
+            res.status(200).send(response);
         }
     })catch((error) => {
         console.error(error);
