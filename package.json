@@ -1,5 +1,5 @@
 {
-  "name": "asgardeo-nodejs-sdk",
+  "name": "@asgardeo/auth-nodejs-sdk",
   "version": "0.0.1",
   "description": "Asgardeo Auth NodeJS SDK and Sample Apps",
   "main": "index.js",
@@ -24,7 +24,7 @@
     "url": "git+https://github.com/Suvink/asgardeo-auth-nodejs-sdk.git"
   },
   "author": "Asgardeo",
-  "license": "ISC",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/Suvink/asgardeo-auth-nodejs-sdk/issues"
   },
