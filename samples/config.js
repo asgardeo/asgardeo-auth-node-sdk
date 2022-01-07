@@ -4,7 +4,7 @@ const config = {
     "signInRedirectURL": "http://localhost:5000/login",
     "signOutRedirectURL": "http://localhost:5000",
     "enableOIDCSessionManagement": true,
-    "scope": ["openid", "profile"],
+    "scope": [ "openid", "profile" ],
     "validateIDToken": true,
-}
+};
 module.exports = config;

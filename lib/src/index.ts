@@ -15,6 +15,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+//Add Ponyfills for Fetch API
 import fetch, { Headers, Request, Response } from "cross-fetch";
 if (!globalThis.fetch) {
     globalThis.fetch = fetch;
@@ -22,4 +24,5 @@ if (!globalThis.fetch) {
     globalThis.Request = Request;
     globalThis.Response = Response;
 }
+
 export * from "./public-api";
