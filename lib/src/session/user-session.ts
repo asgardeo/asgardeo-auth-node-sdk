@@ -1,6 +1,6 @@
-import { AsgardeoAuthException } from '../exception';
-import { TokenResponse, Store } from '@asgardeo/auth-js';
-import { SessionUtils } from '../utils';
+import { Store, TokenResponse } from "@asgardeo/auth-js";
+import { AsgardeoAuthException } from "../exception";
+import { SessionUtils } from "../utils";
 
 export class UserSession {
 
@@ -34,6 +34,8 @@ export class UserSession {
 
     public async getUserSession(uuid: string): Promise<object> {
         const sessionData = await this._sessionStore.getData(uuid);
+        //DEBUG
+        // eslint-disable-next-line no-console
         console.log(JSON.stringify(sessionData))
         return Promise.resolve(JSON.parse(sessionData))
     }
@@ -43,7 +45,7 @@ export class UserSession {
         return uuid;
     }
 
-    public async destroyUserSession(uuid: string): Promise<Boolean> {
+    public async destroyUserSession(uuid: string): Promise<boolean> {
 
         if (!uuid) {
             Promise.reject(

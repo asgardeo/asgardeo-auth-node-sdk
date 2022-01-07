@@ -15,12 +15,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { AsgardeoAuthClient, AuthClientConfig, Store, CryptoUtils } from "@asgardeo/auth-js";
+import { AsgardeoAuthClient, AuthClientConfig, CryptoUtils, Store } from "@asgardeo/auth-js";
+import cache from "memory-cache"; // Only for debugging
 import { AsgardeoAuthException } from "../exception";
-import { NodeTokenResponse, AuthURLCallback } from '../models';
+import { AuthURLCallback, NodeTokenResponse } from "../models";
+import { UserSession } from "../session";
 import { MemoryCacheStore } from "../stores";
-import cache from 'memory-cache'; // Only for debugging
-import { UserSession } from '../session';
 import { NodeCryptoUtils } from "../utils/crypto-utils";
 
 export class AsgardeoNodeCore<T>{
@@ -44,7 +44,8 @@ export class AsgardeoNodeCore<T>{
         this._auth.initialize(config);
     }
 
-    public async signIn(authURLCallback: AuthURLCallback, authorizationCode?: string, sessionState?: string): Promise<NodeTokenResponse> {
+    public async signIn(authURLCallback: AuthURLCallback, authorizationCode?: string, sessionState?: string)
+        : Promise<NodeTokenResponse> {
 
         //Check if the authorization code or session state is there.
         //If so, generate the access token, otherwise generate the auth URL and return with callback function.
@@ -54,12 +55,12 @@ export class AsgardeoNodeCore<T>{
             authURLCallback(authURL);
             return Promise.resolve({
                 accessToken: "",
-                idToken: "",
                 expiresIn: "",
-                scope: "",
+                idToken: "",
                 refreshToken: "",
-                tokenType: "",
-                session: ""
+                scope: "",
+                session: "",
+                tokenType: ""
             })
         } else {
             const tokenResponse = await this.requestAccessToken(authorizationCode, sessionState);
@@ -67,7 +68,7 @@ export class AsgardeoNodeCore<T>{
                 return Promise.resolve(tokenResponse);
             }
         }
-       
+
         return Promise.reject(
             new AsgardeoAuthException(
                 "AUTH_CORE-RAT1-NF01", //TODO: Not sure
@@ -134,6 +135,7 @@ export class AsgardeoNodeCore<T>{
         }
 
         //DEBUG
+        // eslint-disable-next-line no-console
         console.log(cache.keys());
 
         return Promise.resolve(response);
@@ -172,7 +174,7 @@ export class AsgardeoNodeCore<T>{
         }
     }
 
-    public async isAuthenticated(uuid: string): Promise<Boolean> {
+    public async isAuthenticated(uuid: string): Promise<boolean> {
         try {
             const existing_user_session = await this._sessionStore.getUserSession(uuid);
             const isServerAuthenticated = Object.keys(existing_user_session).length === 0 ? false : true;
@@ -204,6 +206,7 @@ export class AsgardeoNodeCore<T>{
         const destroySession = await this._sessionStore.destroyUserSession(uuid);
 
         //DEBUG
+        // eslint-disable-next-line no-console
         console.log(cache.keys())
 
         if (!signOutURL || !destroySession) {

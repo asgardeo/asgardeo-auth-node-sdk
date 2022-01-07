@@ -15,4 +15,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import fetch, { Headers, Request, Response } from "cross-fetch";
+if (!globalThis.fetch) {
+    globalThis.fetch = fetch;
+    globalThis.Headers = Headers;
+    globalThis.Request = Request;
+    globalThis.Response = Response;
+}
 export * from "./public-api";
