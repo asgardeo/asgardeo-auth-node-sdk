@@ -4,11 +4,11 @@ import {
     JWKInterface,
     SUPPORTED_SIGNATURE_ALGORITHMS
 } from "@asgardeo/auth-js";
-import { AsgardeoAuthException } from "../exception";
-import base64url from 'base64url';
-import randombytes from 'secure-random-bytes';
-import * as jose from 'jose';
+import base64url from "base64url";
 import sha256 from "fast-sha256";
+import * as jose from "jose";
+import randombytes from "secure-random-bytes";
+import { AsgardeoAuthException } from "../exception";
 
 export class NodeCryptoUtils implements CryptoUtils {
 
@@ -130,7 +130,7 @@ export class NodeCryptoUtils implements CryptoUtils {
      */
     public decodeIDToken(idToken: string): DecodedIDTokenPayload {
         try {
-            const utf8String = base64url.decode(idToken.split(".")[1], "utf8");
+            const utf8String = base64url.decode(idToken.split(".")[ 1 ], "utf8");
             const payload = JSON.parse(utf8String);
 
             return payload;

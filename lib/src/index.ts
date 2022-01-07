@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import fetch, { Request, Headers, Response } from 'cross-fetch';
+import fetch, { Headers, Request, Response } from "cross-fetch";
 if (!globalThis.fetch) {
     globalThis.fetch = fetch;
     globalThis.Headers = Headers;

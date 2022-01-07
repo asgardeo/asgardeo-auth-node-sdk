@@ -56,11 +56,14 @@ export class AsgardeoNodeClient<T>{
     }
 
     /**
-     * This method logs in a user. If the authorization code is not available it will resolve with the authorization URL to authorize the user.
+     * This method logs in a user. If the authorization code is not available it will resolve with the
+     * authorization URL to authorize the user.
      * @param {string} authorizationCode - The authorization code obtained from Asgardeo after a user signs in.
      * @param {String} sessionState - The session state obtained from Asgardeo after a user signs in.
-     * 
-     * @return {Promise<URLResponse | NodeTokenResponse>} - A Promise that resolves with the [`URLResponse`](#URLResponse) object or a Promise that resolves with the [`NodeTokenResponse`](#NodeTokenResponse) object.
+     *
+     * @return {Promise<URLResponse | NodeTokenResponse>} - A Promise that resolves with the
+     * [`URLResponse`](#URLResponse) object or a Promise that resolves with
+     * the [`NodeTokenResponse`](#NodeTokenResponse) object.
      *
      * @example
      * ```
@@ -81,15 +84,16 @@ export class AsgardeoNodeClient<T>{
      * @memberof AsgardeoNodeClient
      *
     */
-    public async signIn(authURLCallback: AuthURLCallback, authorizationCode?: string, sessionState?: string): Promise<NodeTokenResponse> {
+    public async signIn(authURLCallback: AuthURLCallback, authorizationCode?: string, sessionState?: string)
+        : Promise<NodeTokenResponse> {
         return this._authCore.signIn(authURLCallback, authorizationCode, sessionState);
     }
 
-
     /**
      * This method clears all session data and returns the sign-out URL.
-     * @param {string} uuid - The uuid of the user. (If you are using ExpressJS, you may get this from the request cookies)
-     * 
+     * @param {string} uuid - The uuid of the user. (If you are using ExpressJS,
+     * you may get this from the request cookies)
+     *
      * @return {Promise<string>} - A Promise that resolves with the sign-out URL.
      *
      * @example
@@ -109,8 +113,9 @@ export class AsgardeoNodeClient<T>{
 
     /**
     * This method returns a boolean value indicating if the user is authenticated or not.
-    * @param {string} uuid - The uuid of the user. (If you are using ExpressJS, you may get this from the request cookies)
-    * 
+    * @param {string} uuid - The uuid of the user.
+    * (If you are using ExpressJS, you may get this from the request cookies)
+    *
     * @return { Promise<boolean>} -A boolean value that indicates of the user is authenticated or not.
     *
     * @example
@@ -123,14 +128,15 @@ export class AsgardeoNodeClient<T>{
     * @memberof AsgardeoNodeClient
     *
    */
-    public async isAuthenticated(uuid: string): Promise<Boolean> {
+    public async isAuthenticated(uuid: string): Promise<boolean> {
         return this._authCore.isAuthenticated(uuid);
     }
 
     /**
    * This method returns the id token.
-   * @param {string} uuid - The uuid of the user. (If you are using ExpressJS, you may get this from the request cookies)
-   * 
+   * @param {string} uuid - The uuid of the user.
+   * (If you are using ExpressJS, you may get this from the request cookies)
+   *
    * @return {Promise<string>} -A Promise that resolves with the ID Token.
    *
    * @example

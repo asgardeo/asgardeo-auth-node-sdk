@@ -16,7 +16,7 @@
  * under the License.
  */
 import { Store } from "@asgardeo/auth-js";
-import cache from 'memory-cache';
+import cache from "memory-cache";
 
 export class MemoryCacheStore implements Store {
     public async setData(key: string, value: string): Promise<void> {
