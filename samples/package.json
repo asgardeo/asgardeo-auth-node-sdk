@@ -1,6 +1,6 @@
 {
-  "name": "asgardeo-auth-nodejs-sample",
-  "description": "A sample app to demonstrate the usage of @asgardeo/node-js-sdk",
+  "name": "@asgardeo/auth-node-sample",
+  "description": "A sample app to demonstrate the usage of @asgardeo/asgardeo-auth-node",
   "version": "0.0.1",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
     "serve": "nodemon index.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Asgardeo",
   "license": "ISC",
   "devDependencies": {
     "nodemon": "^2.0.15"
