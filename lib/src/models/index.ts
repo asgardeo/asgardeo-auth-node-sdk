@@ -17,6 +17,3 @@
  */
 export * from "./token-response";
 export * from "./url-callback";
-
-//Export models from Auth JS SDK
-export * from "@asgardeo/auth-js";
