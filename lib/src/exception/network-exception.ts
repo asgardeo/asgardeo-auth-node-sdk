@@ -23,7 +23,7 @@
      public networkErrorMessage: string;
      public status: number | undefined;
      public networkErrorData: string;
- 
+
      public constructor(
          code: string | undefined,
          file: string,
@@ -47,4 +47,3 @@
          this.networkErrorData = networkErrorData;
      }
  }
- 
