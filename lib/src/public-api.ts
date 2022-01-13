@@ -17,3 +17,4 @@
 */
 export * from "./client";
 export * from "./models";
+export * from "@asgardeo/auth-js";
