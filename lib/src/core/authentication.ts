@@ -16,7 +16,6 @@
  * under the License.
  */
 import { AsgardeoAuthClient, AuthClientConfig, CryptoUtils, Store } from "@asgardeo/auth-js";
-import cache from "memory-cache"; // Only for debugging
 import { AsgardeoAuthException } from "../exception";
 import { AuthURLCallback, NodeTokenResponse } from "../models";
 import { UserSession } from "../session";
@@ -134,10 +133,6 @@ export class AsgardeoNodeCore<T>{
             response = { ...access_token, session: user_uuid };
         }
 
-        //DEBUG
-        // eslint-disable-next-line no-console
-        console.log(cache.keys());
-
         return Promise.resolve(response);
 
     }
@@ -204,10 +199,6 @@ export class AsgardeoNodeCore<T>{
 
         const signOutURL = await this._auth.getSignOutURL();
         const destroySession = await this._sessionStore.destroyUserSession(uuid);
-
-        //DEBUG
-        // eslint-disable-next-line no-console
-        console.log(cache.keys())
 
         if (!signOutURL || !destroySession) {
             return Promise.reject(

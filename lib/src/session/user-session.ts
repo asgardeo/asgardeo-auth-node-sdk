@@ -34,13 +34,10 @@ export class UserSession {
 
     public async getUserSession(uuid: string): Promise<object> {
         const sessionData = await this._sessionStore.getData(uuid);
-        //DEBUG
-        // eslint-disable-next-line no-console
-        console.log(JSON.stringify(sessionData))
-        return Promise.resolve(JSON.parse(sessionData))
+        return Promise.resolve(JSON.parse(sessionData));
     }
 
-    public async getUUID(sub: string): Promise<string>{
+    public async getUUID(sub: string): Promise<string> {
         const uuid = SessionUtils.createUUID(sub);
         return uuid;
     }
@@ -57,7 +54,7 @@ export class UserSession {
                     "No token endpoint was found in the OIDC provider meta data returned by the well-known endpoint " +
                     "or the token endpoint passed to the SDK is empty."
                 )
-            )
+            );
         }
 
         const isValidUUID = await SessionUtils.validateUUID(uuid);
