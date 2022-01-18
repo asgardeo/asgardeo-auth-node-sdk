@@ -1,7 +1,7 @@
 {
   "name": "@asgardeo/auth-node-sdk",
   "version": "0.0.1",
-  "description": "Asgardeo Auth NodeJS SDK and Sample Apps",
+  "description": "Asgardeo Auth Node.js SDK and Sample Apps",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "module": "src/index.ts",

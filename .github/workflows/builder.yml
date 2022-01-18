@@ -14,14 +14,14 @@
 #  specific language governing permissions and limitations
 #  under the License.
 
-# This workflow builds the pushes to the master branch and bumps the version.
+# This workflow builds the pushes to the main branch and bumps the version.
 
 name: Builder
 
 on:
   push:
     branches:
-      - master
+      - main
     paths-ignore:
       - '**/package.json'
       - '**/yarn.lock'

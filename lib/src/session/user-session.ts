@@ -45,17 +45,20 @@ export class UserSession {
         }
 
         const new_session = this._sessionStore.setData(user_uuid, JSON.stringify(sessionData));
+
         return Promise.resolve(user_uuid);
 
     }
 
     public async getUserSession(uuid: string): Promise<object> {
         const sessionData = await this._sessionStore.getData(uuid);
+
         return Promise.resolve(JSON.parse(sessionData));
     }
 
     public async getUUID(sub: string): Promise<string> {
         const uuid = SessionUtils.createUUID(sub);
+
         return uuid;
     }
 
@@ -79,6 +82,7 @@ export class UserSession {
         if (isValidUUID) {
             const removeData = await this._sessionStore.removeData(uuid);
             uuid = "";
+
             return Promise.resolve(true);
         } else {
             return Promise.reject(

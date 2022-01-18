@@ -52,6 +52,7 @@ export class AsgardeoNodeCore<T>{
         if (!authorizationCode || !sessionState) {
             const authURL = await this.getAuthURL();
             authURLCallback(authURL);
+
             return Promise.resolve({
                 accessToken: "",
                 expiresIn: "",
