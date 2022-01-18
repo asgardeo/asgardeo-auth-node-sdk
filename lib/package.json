@@ -1,0 +1,33 @@
+{
+  "name": "@asgardeo/auth-node-sdk",
+  "version": "0.0.1",
+  "description": "Asgardeo Auth NodeJS SDK and Sample Apps",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "module": "src/index.ts",
+  "scripts": {
+    "lint": "eslint --ext .js,.ts .",
+    "fix-lint": "eslint --ext .js,.ts . --fix",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "cross-env NODE_ENV=production rimraf dist && rimraf umd && yarn run type-check",
+    "type-check": "tsc"
+  },
+  "keywords": [],
+  "author": "Asgardeo",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@types/node": "^17.0.3",
+    "cross-env": "^7.0.3",
+    "typescript": "^4.5.2"
+  },
+  "dependencies": {
+    "@asgardeo/auth-js": "^1.0.1",
+    "base64url": "^3.0.1",
+    "cross-fetch": "^3.1.4",
+    "fast-sha256": "^1.3.0",
+    "jose": "^4.3.7",
+    "memory-cache": "^0.2.0",
+    "secure-random-bytes": "^3.0.1",
+    "uuid": "^8.3.2"
+  }
+}
