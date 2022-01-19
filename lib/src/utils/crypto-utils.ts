@@ -25,7 +25,7 @@ import sha256 from "fast-sha256";
 import * as jose from "jose";
 import randombytes from "secure-random-bytes";
 
-export class NodeCryptoUtils implements CryptoUtils<Buffer | string, jose.KeyLike> {
+export class NodeCryptoUtils implements CryptoUtils<Buffer | string, jose.KeyLike | Uint8Array> {
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     public constructor() { }
