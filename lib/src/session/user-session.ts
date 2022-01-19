@@ -15,6 +15,7 @@
 * specific language governing permissions and limitations
 * under the License.
 */
+
 import { Store, TokenResponse } from "@asgardeo/auth-js";
 import { AsgardeoAuthException } from "../exception";
 import { SessionUtils } from "../utils";

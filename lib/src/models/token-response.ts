@@ -15,6 +15,7 @@
 * specific language governing permissions and limitations
 * under the License.
 */
+
 import { TokenResponse } from "@asgardeo/auth-js";
 
 export interface NodeTokenResponse extends TokenResponse {
