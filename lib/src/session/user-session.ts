@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.com) All Rights Reserved.
 *
 * WSO2 Inc. licenses this file to you under the Apache License,
 * Version 2.0 (the "License"); you may not use this file except
@@ -45,17 +45,20 @@ export class UserSession {
         }
 
         const new_session = this._sessionStore.setData(user_uuid, JSON.stringify(sessionData));
+
         return Promise.resolve(user_uuid);
 
     }
 
     public async getUserSession(uuid: string): Promise<object> {
         const sessionData = await this._sessionStore.getData(uuid);
+
         return Promise.resolve(JSON.parse(sessionData));
     }
 
     public async getUUID(sub: string): Promise<string> {
         const uuid = SessionUtils.createUUID(sub);
+
         return uuid;
     }
 
@@ -79,6 +82,7 @@ export class UserSession {
         if (isValidUUID) {
             const removeData = await this._sessionStore.removeData(uuid);
             uuid = "";
+
             return Promise.resolve(true);
         } else {
             return Promise.reject(

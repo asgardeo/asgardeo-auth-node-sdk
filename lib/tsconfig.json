@@ -17,11 +17,23 @@
         "strict": true,
         "allowSyntheticDefaultImports": false,
         "paths": {
-            "*": ["types/*"]
+            "*": [
+                "types/*"
+            ]
         },
         "outDir": "./dist",
-        "lib": ["es6", "dom", "es2017"],
+        "lib": [
+            "es6",
+            "dom",
+            "es2017"
+        ],
     },
     "compileOnSave": false,
-    "exclude": ["node_modules", "test-configs", "src/**/tests/*", "**/*.test.ts", "dist/**/*"]
+    "exclude": [
+        "node_modules",
+        "test-configs",
+        "src/**/tests/*",
+        "**/*.test.ts",
+        "dist/**/*"
+    ]
 }

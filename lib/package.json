@@ -1,7 +1,7 @@
 {
   "name": "@asgardeo/auth-node-sdk",
   "version": "0.0.1",
-  "description": "Asgardeo Auth NodeJS SDK and Sample Apps",
+  "description": "Asgardeo Auth Node.js SDK and Sample Apps",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "module": "src/index.ts",
@@ -21,7 +21,7 @@
     "typescript": "^4.5.2"
   },
   "dependencies": {
-    "@asgardeo/auth-js": "^1.0.1",
+    "@asgardeo/auth-js": "^1.0.2",
     "base64url": "^3.0.1",
     "cross-fetch": "^3.1.4",
     "fast-sha256": "^1.3.0",
