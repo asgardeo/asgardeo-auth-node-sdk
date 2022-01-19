@@ -32,7 +32,7 @@ export class AsgardeoNodeClient<T>{
 
 
     /**
-    * This is the constructor method that returns an instance of the .
+    * This is the constructor method that returns an instance of the `AsgardeoNodeClient` class.
     *
     * @param {AuthClientConfig<T>} config - The configuration object.
     * @param {Store} store - The store object.

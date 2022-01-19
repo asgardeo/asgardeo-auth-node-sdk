@@ -130,7 +130,7 @@ export class AsgardeoNodeCore<T>{
         const existing_user = await this._sessionStore.getUserSession(userId);
 
         //Declare the response type
-        let response: NodeTokenResponse = { ...access_token, session: "" };
+        let response: NodeTokenResponse = { ...tokenResponse, session: "" };
 
         //TODO: double check the logic
         if (Object.keys(existing_user).length === 0 || Object.prototype.hasOwnProperty.call(existing_user, "invalid")) {
@@ -142,7 +142,6 @@ export class AsgardeoNodeCore<T>{
         }
 
         return Promise.resolve(response);
-
     }
 
     public async getIDToken(userId: string): Promise<string> {
