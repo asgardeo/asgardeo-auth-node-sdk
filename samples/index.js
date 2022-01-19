@@ -48,7 +48,7 @@ app.get("/login", (req, res) => {
         console.log(response);
         //Make sure you use the httpOnly and sameSite to prevent from cross-site request forgery (CSRF) attacks.
         if (response.session) {
-            res.cookie('ASGARDEO_SESSION_ID', response.session, { maxAge: 900000, httpOnly: true, sameSite: true });
+            res.cookie('ASGARDEO_SESSION_ID', response.session, { maxAge: 900000, httpOnly: true, sameSite: "strict" });
             res.status(200).send(response);
         }
     });
