@@ -35,12 +35,10 @@ export class UserSession {
         if (!user_uuid) {
             return Promise.reject(
                 new AsgardeoAuthException(
-                    "AUTH_CORE-RAT1-NF01", //TODO: Not sure
-                    "user-session",
-                    "createUID",
+                    "NODE_CORE-CUS1-NF01",
+                    "createUID()",
                     "Creating UID failed",
-                    "No token endpoint was found in the OIDC provider meta data returned by the well-known endpoint " +
-                    "or the token endpoint passed to the SDK is empty."
+                    "Could not create a UUID for the session."
                 )
             );
         }
@@ -68,12 +66,10 @@ export class UserSession {
         if (!uuid) {
             Promise.reject(
                 new AsgardeoAuthException(
-                    "AUTH_CORE-RAT1-NF01", //TODO: Not sure
-                    "user-session",
-                    "getUserSession",
+                    "NODE_CORE-DUS1-NF01",
+                    "destroyUserSession()",
                     "User UUID is not found",
-                    "No token endpoint was found in the OIDC provider meta data returned by the well-known endpoint " +
-                    "or the token endpoint passed to the SDK is empty."
+                    "No user UUID has passed as a parameter "
                 )
             );
         }
@@ -88,9 +84,8 @@ export class UserSession {
         } else {
             return Promise.reject(
                 new AsgardeoAuthException(
-                    "AUTH_CORE-RAT1-NF01", //TODO: Not sure
-                    "user-session",
-                    "destroyUserSession",
+                    "AUTH_CORE-RAT1-NV01",
+                    "removeData()",
                     "Destroying session failed",
                     "The provided UUID is not valid."
                 )
