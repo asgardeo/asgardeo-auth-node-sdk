@@ -84,7 +84,7 @@ export class UserSession {
         } else {
             return Promise.reject(
                 new AsgardeoAuthException(
-                    "AUTH_CORE-RAT1-NV01",
+                    "NODE_CORE-RAT1-NV01",
                     "removeData()",
                     "Destroying session failed",
                     "The provided UUID is not valid."
