@@ -18,7 +18,7 @@
 
 import { Store, TokenResponse } from "@asgardeo/auth-js";
 import { AsgardeoAuthException } from "../exception";
-import { SessionUtils } from "../utils";
+import { Logger, SessionUtils } from "../utils";
 
 export class UserSession {
 
@@ -44,6 +44,7 @@ export class UserSession {
         }
 
         const new_session = this._sessionStore.setData(user_uuid, JSON.stringify(sessionData));
+        Logger.debug("New Session Created for " + user_uuid);
 
         return Promise.resolve(user_uuid);
 
@@ -78,6 +79,7 @@ export class UserSession {
 
         if (isValidUUID) {
             const removeData = await this._sessionStore.removeData(uuid);
+            Logger.debug("Session destroyed for user " + uuid);
             uuid = "";
 
             return Promise.resolve(true);

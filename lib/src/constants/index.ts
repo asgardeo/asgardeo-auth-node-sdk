@@ -17,3 +17,4 @@
 */
 
 export * from "./uuid-config";
+export * from "./logger-config";
