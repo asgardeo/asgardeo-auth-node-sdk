@@ -72,9 +72,8 @@ export class AsgardeoNodeCore<T>{
 
         return Promise.reject(
             new AsgardeoAuthException(
-                "AUTH_CORE-RAT1-NF01", //TODO: Not sure
-                "node-authentication",
-                "signIn",
+                "NODE_CORE-SI1-NF01",
+                "signIn()",
                 "Access token or decoded token failed.",
                 "No token endpoint was found in the OIDC provider meta data returned by the well-known endpoint " +
                 "or the token endpoint passed to the SDK is empty."
@@ -91,12 +90,10 @@ export class AsgardeoNodeCore<T>{
         } else {
             return Promise.reject(
                 new AsgardeoAuthException(
-                    "AUTH_CORE-RAT1-NF01", //TODO: Not sure
-                    "node-authentication",
-                    "getAuthURL",
-                    "Access token or decoded token failed.",
-                    "No token endpoint was found in the OIDC provider meta data returned by the well-known endpoint " +
-                    "or the token endpoint passed to the SDK is empty."
+                    "NODE_CORE-GAU1-NF01",
+                    "getAuthURL()",
+                    "Getting Authorization URL failed.",
+                    "No authorization URL was returned by the well-known endpoint "
                 )
             )
         }
@@ -110,9 +107,8 @@ export class AsgardeoNodeCore<T>{
         if (!(access_token && sub_from_token)) {
             return Promise.reject(
                 new AsgardeoAuthException(
-                    "AUTH_CORE-RAT1-NF01", //TODO: Not sure
-                    "node-authentication",
-                    "requestAccessToken",
+                    "NODE_CORE-RAT1-NF01",
+                    "requestAccessToken()",
                     "Access token or decoded token failed.",
                     "No token endpoint was found in the OIDC provider meta data returned by the well-known endpoint " +
                     "or the token endpoint passed to the SDK is empty."
@@ -145,12 +141,10 @@ export class AsgardeoNodeCore<T>{
         if (Object.keys(user_session).length === 0) {
             return Promise.reject(
                 new AsgardeoAuthException(
-                    "AUTH_CORE-RAT1-NF01", //TODO: Not sure
-                    "node-authentication",
-                    "getIDToken",
+                    "NODE_CORE-GIT1-NF01",
+                    "getIDToken()",
                     "The user is not logged in.",
-                    "No token endpoint was found in the OIDC provider meta data returned by the well-known endpoint " +
-                    "or the token endpoint passed to the SDK is empty."
+                    "No session ID was found for the requested user. User is not logged in."
                 )
             )
         }
@@ -160,12 +154,10 @@ export class AsgardeoNodeCore<T>{
         } else {
             return Promise.reject(
                 new AsgardeoAuthException(
-                    "AUTH_CORE-RAT1-NF01", //TODO: Not sure
-                    "node-authentication",
-                    "getIDToken",
+                    "NODE_CORE-GIT1-NF02",
+                    "getIDToken()",
                     "Requesting ID Token Failed",
-                    "No token endpoint was found in the OIDC provider meta data returned by the well-known endpoint " +
-                    "or the token endpoint passed to the SDK is empty."
+                    "No ID Token was returned by the well-known endpoint."
                 )
             )
         }
@@ -186,12 +178,11 @@ export class AsgardeoNodeCore<T>{
         } catch (error) {
             return Promise.reject(
                 new AsgardeoAuthException(
-                    "AUTH_CORE-RAT1-NF01", //TODO: Not sure
-                    "node-authentication",
-                    "isAuthenticated",
-                    "Requesting ID Token Failed",
-                    "No token endpoint was found in the OIDC provider meta data returned by the well-known endpoint " +
-                    "or the token endpoint passed to the SDK is empty."
+                    "NODE_CORE-IA1-F01",
+                    "isAuthenticated()",
+                    "Authenticating the user failed",
+                    "Could not obtain the session data from the well-known endpoint" +
+                    "or could not obtain the user session from the Node Store."
                 )
             );
         }
@@ -205,9 +196,8 @@ export class AsgardeoNodeCore<T>{
         if (!signOutURL || !destroySession) {
             return Promise.reject(
                 new AsgardeoAuthException(
-                    "AUTH_CORE-RAT1-NF01", //TODO: Not sure
-                    "node-authentication",
-                    "signout",
+                    "NODE_CORE-SO1-NF01",
+                    "signOut()",
                     "Signing out the user failed.",
                     "Could not obtain the signout URL from the server."
                 )

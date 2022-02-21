@@ -16,34 +16,31 @@
  * under the License.
  */
 
- import { AsgardeoAuthException } from "./exception";
+import { AsgardeoAuthException } from "./exception";
 
- export class AsgardeoAuthNetworkException extends AsgardeoAuthException {
-     public networkErrorCode: string;
-     public networkErrorMessage: string;
-     public status: number | undefined;
-     public networkErrorData: string;
+export class AsgardeoAuthNetworkException extends AsgardeoAuthException {
+    public networkErrorCode: string;
+    public networkErrorMessage: string;
+    public status: number | undefined;
+    public networkErrorData: string;
 
-     public constructor(
-         code: string | undefined,
-         file: string,
-         method: string,
-         message: string,
-         description: string,
-         networkErrorCode: string,
-         networkErrorMessage: string,
-         status: number | undefined,
-         networkErrorData: string
-     ) {
-         super(code, file, method, message, description);
-         this.name = this.constructor.name;
-         this.code = code;
-         this.file = file;
-         this.method = method;
-         this.description = description;
-         this.networkErrorCode = networkErrorCode;
-         this.networkErrorMessage = networkErrorMessage;
-         this.status = status;
-         this.networkErrorData = networkErrorData;
-     }
- }
+    public constructor(
+        code: string | undefined,
+        method: string,
+        message: string,
+        name: string,
+        networkErrorCode: string,
+        networkErrorMessage: string,
+        status: number | undefined,
+        networkErrorData: string
+    ) {
+        super(code, method, name, message);
+        this.name = name;
+        this.code = code;
+        this.method = method;
+        this.networkErrorCode = networkErrorCode;
+        this.networkErrorMessage = networkErrorMessage;
+        this.status = status;
+        this.networkErrorData = networkErrorData;
+    }
+}
