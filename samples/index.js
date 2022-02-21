@@ -18,7 +18,7 @@
 
 const express = require('express');
 const cookieParser = require('cookie-parser');
-const { AsgardeoNodeClient } = require('@asgardeo/auth-nodejs-sdk');
+const { AsgardeoNodeClient } = require('@asgardeo/auth-node-sdk');
 const config = require('./config');
 
 //Constants

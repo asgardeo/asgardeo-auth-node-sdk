@@ -22,6 +22,7 @@ import { AuthURLCallback, NodeTokenResponse } from "../models";
 import { UserSession } from "../session";
 import { MemoryCacheStore } from "../stores";
 import { NodeCryptoUtils } from "../utils/crypto-utils";
+import { Logger } from "../utils";
 
 export class AsgardeoNodeCore<T>{
 
@@ -42,6 +43,7 @@ export class AsgardeoNodeCore<T>{
         this._auth = new AsgardeoAuthClient(this._store, this._cryptoUtils);
         this._sessionStore = new UserSession(this._store);
         this._auth.initialize(config);
+        Logger.debug("Initialized AsgardeoAuthClient successfully");
     }
 
     public async signIn(authURLCallback: AuthURLCallback, authorizationCode?: string, sessionState?: string)

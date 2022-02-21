@@ -17,3 +17,4 @@
 */
 
 export * from "./session-utils";
+export * from "./logger-utils";
