@@ -42,7 +42,7 @@ export class Logger {
             console.log(
                 LOGGER_CONFIG.bgYellow,
                 LOGGER_CONFIG.fgBlack,
-                "WARN",
+                "WARNING",
                 LOGGER_CONFIG.reset,
                 LOGGER_CONFIG.fgYellow,
                 message,

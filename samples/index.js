@@ -63,6 +63,7 @@ app.get("/id", (req, res) => {
         //You may redirect the user to login endpoint here.
         // res.status(301).redirect("/login");
     } else {
+        console.log(req.cookies.ASGARDEO_SESSION_ID)
         authClient.getIDToken(req.cookies.ASGARDEO_SESSION_ID).then(response => {
             res.send(response);
         }).catch(err => {

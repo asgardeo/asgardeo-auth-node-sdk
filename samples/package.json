@@ -15,7 +15,7 @@
     "nodemon": "^2.0.15"
   },
   "dependencies": {
-    "@asgardeo/auth-node-sdk": "^0.0.1",
+    "@asgardeo/auth-node-sdk": "file:../lib",
     "cookie-parser": "^1.4.6",
     "express": "^4.17.1"
   }

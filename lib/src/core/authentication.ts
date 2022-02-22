@@ -21,8 +21,8 @@ import { AsgardeoAuthException } from "../exception";
 import { AuthURLCallback, NodeTokenResponse } from "../models";
 import { UserSession } from "../session";
 import { MemoryCacheStore } from "../stores";
-import { NodeCryptoUtils } from "../utils/crypto-utils";
 import { Logger } from "../utils";
+import { NodeCryptoUtils } from "../utils/crypto-utils";
 
 export class AsgardeoNodeCore<T>{
 
@@ -64,7 +64,7 @@ export class AsgardeoNodeCore<T>{
                 scope: "",
                 session: "",
                 tokenType: ""
-            })
+            });
         } else {
             const tokenResponse = await this.requestAccessToken(authorizationCode, sessionState);
             if (tokenResponse) {
@@ -88,7 +88,7 @@ export class AsgardeoNodeCore<T>{
         const authURL = await this._auth.getAuthorizationURL();
 
         if (authURL) {
-            return Promise.resolve(authURL.toString())
+            return Promise.resolve(authURL.toString());
         } else {
             return Promise.reject(
                 new AsgardeoAuthException(
@@ -97,7 +97,7 @@ export class AsgardeoNodeCore<T>{
                     "Getting Authorization URL failed.",
                     "No authorization URL was returned by the well-known endpoint "
                 )
-            )
+            );
         }
     }
 
@@ -115,7 +115,7 @@ export class AsgardeoNodeCore<T>{
                     "No token endpoint was found in the OIDC provider meta data returned by the well-known endpoint " +
                     "or the token endpoint passed to the SDK is empty."
                 )
-            )
+            );
         }
 
         //Create a UUID and check if the user has a session already
@@ -125,11 +125,12 @@ export class AsgardeoNodeCore<T>{
         //Declare the response type
         let response: NodeTokenResponse = { ...access_token, session: "" };
 
-        if (Object.keys(existing_user).length === 0) {
+        //TODO: double check the logic
+        if (Object.keys(existing_user).length === 0 || Object.prototype.hasOwnProperty.call(existing_user, "invalid")) {
             //Create a new session if the user does not have one already
-            const new_user_session = await this._sessionStore.createUserSession(sub_from_token.sub, access_token)
+            const new_user_session = await this._sessionStore.createUserSession(sub_from_token.sub, access_token);
             response = { ...access_token, session: new_user_session };
-        } else {
+        }else {
             response = { ...access_token, session: user_uuid };
         }
 
@@ -139,8 +140,8 @@ export class AsgardeoNodeCore<T>{
 
     public async getIDToken(uuid: string): Promise<string> {
 
-        const user_session = await this._sessionStore.getUserSession(uuid);
-        if (Object.keys(user_session).length === 0) {
+        const is_logged_in = await this.isAuthenticated(uuid);
+        if (!is_logged_in) {
             return Promise.reject(
                 new AsgardeoAuthException(
                     "NODE_CORE-GIT1-NF01",
@@ -148,11 +149,11 @@ export class AsgardeoNodeCore<T>{
                     "The user is not logged in.",
                     "No session ID was found for the requested user. User is not logged in."
                 )
-            )
+            );
         }
         const idToken = await this._auth.getIDToken();
         if (idToken) {
-            return Promise.resolve(idToken)
+            return Promise.resolve(idToken);
         } else {
             return Promise.reject(
                 new AsgardeoAuthException(
@@ -161,8 +162,31 @@ export class AsgardeoNodeCore<T>{
                     "Requesting ID Token Failed",
                     "No ID Token was returned by the well-known endpoint."
                 )
-            )
+            );
         }
+    }
+
+    public async refreshAccessToken(): Promise<NodeTokenResponse> {
+        const refreshed_token = await this._auth.refreshAccessToken();
+        let response: NodeTokenResponse = { ...refreshed_token, session: "" };
+
+        if (refreshed_token) {
+            const sub_from_token = await this._auth.getDecodedIDToken();
+            const refreshed_session = await this._sessionStore.createUserSession(sub_from_token.sub, refreshed_token);
+            response = { ...refreshed_token, session: refreshed_session };
+
+            return Promise.resolve(response);
+        }
+
+        return Promise.reject(
+            new AsgardeoAuthException(
+                "NODE_CORE-RAT2-NF02",
+                "refreshAccessToken()",
+                "Refreshing ID Token Failed",
+                "No ID Token was returned by the well-known endpoint."
+            )
+        );
+
     }
 
     public async isAuthenticated(uuid: string): Promise<boolean> {
@@ -171,6 +195,13 @@ export class AsgardeoNodeCore<T>{
             const isServerAuthenticated = Object.keys(existing_user_session).length === 0 ? false : true;
 
             const isAsgardeoAuthenticated = await this._auth.isAuthenticated();
+
+            //If the session exists but invalid, refresh the token
+            if (Object.prototype.hasOwnProperty.call(existing_user_session, "invalid")) {
+                Logger.debug("Refreshing Access Token");
+                const refreshed_token = await this.refreshAccessToken();
+                if (refreshed_token) isServerAuthenticated === true;
+            }
 
             if (isAsgardeoAuthenticated && isServerAuthenticated) {
                 return Promise.resolve(true);
@@ -203,7 +234,7 @@ export class AsgardeoNodeCore<T>{
                     "Signing out the user failed.",
                     "Could not obtain the signout URL from the server."
                 )
-            )
+            );
         }
 
         return Promise.resolve(signOutURL);
