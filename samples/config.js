@@ -1,6 +1,6 @@
 const config = {
-    "clientID": "Mm2adXV2jnL9pfo2kCHIEi_ej3Aa",
-    "serverOrigin": "https://api.asgardeo.io/t/iconicto",
+    "clientID": "",
+    "serverOrigin": "",
     "signInRedirectURL": "http://localhost:5000/login",
     "signOutRedirectURL": "http://localhost:5000",
     "scope": [ "openid", "profile" ],

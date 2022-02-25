@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.com) All Rights Reserved.
+* Copyright (c) 2022, WSO2 Inc. (http://www.wso2.com) All Rights Reserved.
 *
 * WSO2 Inc. licenses this file to you under the Apache License,
 * Version 2.0 (the "License"); you may not use this file except
@@ -63,7 +63,6 @@ app.get("/id", (req, res) => {
         //You may redirect the user to login endpoint here.
         // res.status(301).redirect("/login");
     } else {
-        console.log(req.cookies.ASGARDEO_SESSION_ID)
         authClient.getIDToken(req.cookies.ASGARDEO_SESSION_ID).then(response => {
             res.send(response);
         }).catch(err => {
