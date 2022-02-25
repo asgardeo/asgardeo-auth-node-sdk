@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.com) All Rights Reserved.
+* Copyright (c) 2022, WSO2 Inc. (http://www.wso2.com) All Rights Reserved.
 *
 * WSO2 Inc. licenses this file to you under the Apache License,
 * Version 2.0 (the "License"); you may not use this file except
@@ -42,7 +42,7 @@ export class Logger {
             console.log(
                 LOGGER_CONFIG.bgYellow,
                 LOGGER_CONFIG.fgBlack,
-                "WARN",
+                "WARNING",
                 LOGGER_CONFIG.reset,
                 LOGGER_CONFIG.fgYellow,
                 message,

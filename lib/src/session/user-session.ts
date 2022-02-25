@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.com) All Rights Reserved.
+* Copyright (c) 2022, WSO2 Inc. (http://www.wso2.com) All Rights Reserved.
 *
 * WSO2 Inc. licenses this file to you under the Apache License,
 * Version 2.0 (the "License"); you may not use this file except
@@ -18,6 +18,7 @@
 
 import { Store, TokenResponse } from "@asgardeo/auth-js";
 import { AsgardeoAuthException } from "../exception";
+import { NodeSessionData } from "../models";
 import { Logger, SessionUtils } from "../utils";
 
 export class UserSession {
@@ -43,17 +44,41 @@ export class UserSession {
             );
         }
 
-        const new_session = this._sessionStore.setData(user_uuid, JSON.stringify(sessionData));
+        //Append the expiary date
+        const nodeSessionData : NodeSessionData = {
+            ...sessionData,
+            createdAt: Date.now()
+        }
+
+        const new_session = this._sessionStore.setData(user_uuid, JSON.stringify(nodeSessionData));
         Logger.debug("New Session Created for " + user_uuid);
 
         return Promise.resolve(user_uuid);
 
     }
 
-    public async getUserSession(uuid: string): Promise<object> {
-        const sessionData = await this._sessionStore.getData(uuid);
+    public async getUserSession(uuid: string): Promise<NodeSessionData> {
+        const rawSessionData = await this._sessionStore.getData(uuid);
+        const sessionData = JSON.parse(rawSessionData);
 
-        return Promise.resolve(JSON.parse(sessionData));
+        //Check if a session is already stored in the Node Store
+        if (Object.keys(sessionData).length !== 0) {
+            //Validate the existing session
+            const isValidSession = await SessionUtils.validateSession(sessionData);
+
+            //Destroy the session if it is invalid
+            if (!isValidSession) {
+                Logger.debug("Destroying invalid session");
+                this.destroyUserSession(uuid);
+
+                return Promise.resolve({
+                    ...sessionData,
+                    expired: true
+                });
+            }
+        }
+
+        return Promise.resolve(sessionData);
     }
 
     public async getUUID(sub: string): Promise<string> {
@@ -70,7 +95,7 @@ export class UserSession {
                     "NODE_CORE-DUS1-NF01",
                     "destroyUserSession()",
                     "User UUID is not found",
-                    "No user UUID has passed as a parameter "
+                    "No user UUID has passed as a parameter"
                 )
             );
         }

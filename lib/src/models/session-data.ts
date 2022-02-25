@@ -16,4 +16,9 @@
 * under the License.
 */
 
-export * from "./user-session";
+import { TokenResponse } from "@asgardeo/auth-js";
+
+export interface NodeSessionData extends TokenResponse {
+    createdAt: number,
+    expired?: boolean;
+}
