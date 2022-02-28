@@ -44,7 +44,7 @@ app.get("/login", (req, res) => {
             return;
         }
     };
-    authClient.signIn(redirectCallback, req.query.code, req.query.session_state).then(response => {
+    authClient.signIn(redirectCallback, req.query.code, req.query.session_state, req.query.state).then(response => {
         console.log(response);
         //Make sure you use the httpOnly and sameSite to prevent from cross-site request forgery (CSRF) attacks.
         if (response.session) {

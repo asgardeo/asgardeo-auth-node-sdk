@@ -16,4 +16,4 @@
  * under the License.
  */
 
-export const UUID_VERSION = 5;
+export const UUID_VERSION = 4;

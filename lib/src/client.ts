@@ -61,6 +61,8 @@ export class AsgardeoNodeClient<T>{
      * authorization URL to authorize the user.
      * @param {string} authorizationCode - The authorization code obtained from Asgardeo after a user signs in.
      * @param {String} sessionState - The session state obtained from Asgardeo after a user signs in.
+     * @param {string} userID - (Optional) A unique ID of the user to be authenticated. This is useful in multi-user
+     * scenarios where each user should be uniquely identified.
      *
      * @return {Promise<URLResponse | NodeTokenResponse>} - A Promise that resolves with the
      * [`URLResponse`](#URLResponse) object or a Promise that resolves with
@@ -85,21 +87,25 @@ export class AsgardeoNodeClient<T>{
      * @memberof AsgardeoNodeClient
      *
     */
-    public async signIn(authURLCallback: AuthURLCallback, authorizationCode?: string, sessionState?: string)
-        : Promise<NodeTokenResponse> {
-        return this._authCore.signIn(authURLCallback, authorizationCode, sessionState);
+    public async signIn(
+        authURLCallback: AuthURLCallback,
+        authorizationCode?: string,
+        sessionState?: string,
+        userId?: string
+    ): Promise<NodeTokenResponse> {
+        return this._authCore.signIn(authURLCallback, authorizationCode, sessionState, userId);
     }
 
     /**
      * This method clears all session data and returns the sign-out URL.
-     * @param {string} uuid - The uuid of the user. (If you are using ExpressJS,
+     * @param {string} userId - The userId of the user. (If you are using ExpressJS,
      * you may get this from the request cookies)
      *
      * @return {Promise<string>} - A Promise that resolves with the sign-out URL.
      *
      * @example
      * ```
-     * const signOutUrl = await auth.signOut(uuid);
+     * const signOutUrl = await auth.signOut(userId);
      * ```
      *
      * @link https://github.com/asgardeo/asgardeo-auth-js-sdk/tree/master#signOut
@@ -107,14 +113,14 @@ export class AsgardeoNodeClient<T>{
      * @memberof AsgardeoNodeClient
      *
     */
-    public async signOut(uuid: string): Promise<string> {
-        return this._authCore.signOut(uuid);
+    public async signOut(userId: string): Promise<string> {
+        return this._authCore.signOut(userId);
     }
 
 
     /**
     * This method returns a boolean value indicating if the user is authenticated or not.
-    * @param {string} uuid - The uuid of the user.
+    * @param {string} userId - The userId of the user.
     * (If you are using ExpressJS, you may get this from the request cookies)
     *
     * @return { Promise<boolean>} -A boolean value that indicates of the user is authenticated or not.
@@ -129,13 +135,13 @@ export class AsgardeoNodeClient<T>{
     * @memberof AsgardeoNodeClient
     *
    */
-    public async isAuthenticated(uuid: string): Promise<boolean> {
-        return this._authCore.isAuthenticated(uuid);
+    public async isAuthenticated(userId: string): Promise<boolean> {
+        return this._authCore.isAuthenticated(userId);
     }
 
     /**
    * This method returns the id token.
-   * @param {string} uuid - The uuid of the user.
+   * @param {string} userId - The userId of the user.
    * (If you are using ExpressJS, you may get this from the request cookies)
    *
    * @return {Promise<string>} -A Promise that resolves with the ID Token.
@@ -150,7 +156,7 @@ export class AsgardeoNodeClient<T>{
    * @memberof AsgardeoNodeClient
    *
   */
-    public async getIDToken(uuid: string): Promise<string> {
-        return this._authCore.getIDToken(uuid);
+    public async getIDToken(userId: string): Promise<string> {
+        return this._authCore.getIDToken(userId);
     }
 }
