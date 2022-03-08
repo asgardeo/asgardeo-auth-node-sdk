@@ -1,6 +1,6 @@
 const config = {
     "clientID": "",
-    "serverOrigin": "https://dev.api.asgardeo.io/t/sdktests",
+    "serverOrigin": "",
     "signInRedirectURL": "http://localhost:5000/login",
     "signOutRedirectURL": "http://localhost:5000",
     "scope": [ "openid", "profile" ],
