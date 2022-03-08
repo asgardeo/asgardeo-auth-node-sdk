@@ -46,14 +46,19 @@ export class AsgardeoNodeCore<T>{
         Logger.debug("Initialized AsgardeoAuthClient successfully");
     }
 
-    public async signIn(authURLCallback: AuthURLCallback, authorizationCode?: string, sessionState?: string)
-        : Promise<NodeTokenResponse> {
+    public async signIn(
+        authURLCallback: AuthURLCallback,
+        authorizationCode?: string,
+        sessionState?: string,
+        state?: string
+    ): Promise<NodeTokenResponse> {
 
         //Check if the authorization code or session state is there.
         //If so, generate the access token, otherwise generate the auth URL and return with callback function.
 
-        if (!authorizationCode || !sessionState) {
-            const authURL = await this.getAuthURL();
+        if (!authorizationCode || !sessionState || !state) {
+            const userId = await this._sessionStore.getUUID();
+            const authURL = await this.getAuthURL(userId);
             authURLCallback(authURL);
 
             return Promise.resolve({
@@ -66,7 +71,7 @@ export class AsgardeoNodeCore<T>{
                 tokenType: ""
             });
         } else {
-            const tokenResponse = await this.requestAccessToken(authorizationCode, sessionState);
+            const tokenResponse = await this.requestAccessToken(authorizationCode, sessionState, state);
             if (tokenResponse) {
                 return Promise.resolve(tokenResponse);
             }
@@ -83,9 +88,9 @@ export class AsgardeoNodeCore<T>{
         );
     }
 
-    public async getAuthURL(): Promise<string> {
+    public async getAuthURL(userId: string): Promise<string> {
 
-        const authURL = await this._auth.getAuthorizationURL();
+        const authURL = await this._auth.getAuthorizationURL({}, userId);
 
         if (authURL) {
             return Promise.resolve(authURL.toString());
@@ -101,26 +106,28 @@ export class AsgardeoNodeCore<T>{
         }
     }
 
-    public async requestAccessToken(authorizationCode: string, sessionState: string): Promise<NodeTokenResponse> {
+    public async requestAccessToken(
+        authorizationCode: string,
+        sessionState: string,
+        userId: string
+    ): Promise<NodeTokenResponse> {
 
-        const access_token = await this._auth.requestAccessToken(authorizationCode, sessionState);
-        const sub_from_token = await this._auth.getDecodedIDToken();
+        const access_token = await this._auth.requestAccessToken(authorizationCode, sessionState, userId);
 
-        if (!(access_token && sub_from_token)) {
+        if (!access_token) {
             return Promise.reject(
                 new AsgardeoAuthException(
                     "NODE_CORE-RAT1-NF01",
                     "requestAccessToken()",
-                    "Access token or decoded token failed.",
+                    "Access token failed.",
                     "No token endpoint was found in the OIDC provider meta data returned by the well-known endpoint " +
                     "or the token endpoint passed to the SDK is empty."
                 )
             );
         }
 
-        //Create a UUID and check if the user has a session already
-        const user_uuid = await this._sessionStore.getUUID(sub_from_token.sub);
-        const existing_user = await this._sessionStore.getUserSession(user_uuid);
+        //Check if the user has a session already
+        const existing_user = await this._sessionStore.getUserSession(userId);
 
         //Declare the response type
         let response: NodeTokenResponse = { ...access_token, session: "" };
@@ -128,19 +135,19 @@ export class AsgardeoNodeCore<T>{
         //TODO: double check the logic
         if (Object.keys(existing_user).length === 0 || Object.prototype.hasOwnProperty.call(existing_user, "invalid")) {
             //Create a new session if the user does not have one already
-            const new_user_session = await this._sessionStore.createUserSession(sub_from_token.sub, access_token);
+            const new_user_session = await this._sessionStore.createUserSession(userId, access_token);
             response = { ...access_token, session: new_user_session };
-        }else {
-            response = { ...access_token, session: user_uuid };
+        } else {
+            response = { ...access_token, session: userId };
         }
 
         return Promise.resolve(response);
 
     }
 
-    public async getIDToken(uuid: string): Promise<string> {
+    public async getIDToken(userId: string): Promise<string> {
 
-        const is_logged_in = await this.isAuthenticated(uuid);
+        const is_logged_in = await this.isAuthenticated(userId);
         if (!is_logged_in) {
             return Promise.reject(
                 new AsgardeoAuthException(
@@ -151,7 +158,7 @@ export class AsgardeoNodeCore<T>{
                 )
             );
         }
-        const idToken = await this._auth.getIDToken();
+        const idToken = await this._auth.getIDToken(userId);
         if (idToken) {
             return Promise.resolve(idToken);
         } else {
@@ -166,13 +173,12 @@ export class AsgardeoNodeCore<T>{
         }
     }
 
-    public async refreshAccessToken(): Promise<NodeTokenResponse> {
-        const refreshed_token = await this._auth.refreshAccessToken();
+    public async refreshAccessToken(userId: string): Promise<NodeTokenResponse> {
+        const refreshed_token = await this._auth.refreshAccessToken(userId);
         let response: NodeTokenResponse = { ...refreshed_token, session: "" };
 
         if (refreshed_token) {
-            const sub_from_token = await this._auth.getDecodedIDToken();
-            const refreshed_session = await this._sessionStore.createUserSession(sub_from_token.sub, refreshed_token);
+            const refreshed_session = await this._sessionStore.createUserSession(userId, refreshed_token);
             response = { ...refreshed_token, session: refreshed_session };
 
             return Promise.resolve(response);
@@ -189,17 +195,17 @@ export class AsgardeoNodeCore<T>{
 
     }
 
-    public async isAuthenticated(uuid: string): Promise<boolean> {
+    public async isAuthenticated(userId: string): Promise<boolean> {
         try {
-            const existing_user_session = await this._sessionStore.getUserSession(uuid);
+            const existing_user_session = await this._sessionStore.getUserSession(userId);
             const isServerAuthenticated = Object.keys(existing_user_session).length === 0 ? false : true;
 
-            const isAsgardeoAuthenticated = await this._auth.isAuthenticated();
+            const isAsgardeoAuthenticated = await this._auth.isAuthenticated(userId);
 
             //If the session exists but invalid, refresh the token
             if (Object.prototype.hasOwnProperty.call(existing_user_session, "invalid")) {
                 Logger.debug("Refreshing Access Token");
-                const refreshed_token = await this.refreshAccessToken();
+                const refreshed_token = await this.refreshAccessToken(userId);
                 if (refreshed_token) isServerAuthenticated === true;
             }
 
@@ -221,10 +227,10 @@ export class AsgardeoNodeCore<T>{
         }
     }
 
-    public async signOut(uuid: string): Promise<string> {
+    public async signOut(userId: string): Promise<string> {
 
-        const signOutURL = await this._auth.getSignOutURL();
-        const destroySession = await this._sessionStore.destroyUserSession(uuid);
+        const signOutURL = await this._auth.getSignOutURL(userId);
+        const destroySession = await this._sessionStore.destroyUserSession(userId);
 
         if (!signOutURL || !destroySession) {
             return Promise.reject(

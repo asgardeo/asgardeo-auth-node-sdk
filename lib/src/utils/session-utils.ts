@@ -16,7 +16,7 @@
 * under the License.
 */
 
-import { validate as uuidValidate, version as uuidVersion, v5 as uuidv5 } from "uuid";
+import { validate as uuidValidate, version as uuidVersion, v4 as uuidv4 } from "uuid";
 import { Logger } from ".";
 import { NodeSessionData } from "..";
 import { UUID_VERSION } from "../constants";
@@ -26,8 +26,8 @@ export class SessionUtils {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     private constructor() { }
 
-    public static createUUID(sub: string): string {
-        const generated_uuid = uuidv5(sub, uuidv5.URL);
+    public static createUUID(): string {
+        const generated_uuid = uuidv4();
         return generated_uuid;
     }
 

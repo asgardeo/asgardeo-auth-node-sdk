@@ -71,7 +71,7 @@ app.get("/login", (req, res) => {
             return;
         }
     }
-    authClient.signIn(redirectCallback, req.query.code, req.query.session_state).then(response => {
+    authClient.signIn(redirectCallback, req.query.code, req.query.session_state, req.query.state).then(response => {
         if (response.session) {
             //If the user is already authenticated, it will return the access token.
             //Set the cookie to maintain the session
@@ -157,7 +157,7 @@ new AsgardeoAuth(config:AuthClientConfig<T>, store?: Store);
 ### signIn
 
 ```Typescript
-signIn(authURLCallback: AuthURLCallback, authorizationCode?: string, sessionState?: string): Promise<URLResponse | NodeTokenResponse>
+signIn(authURLCallback: AuthURLCallback, authorizationCode?: string, sessionState?: string, userId?: string): Promise<URLResponse | NodeTokenResponse>
 ```
 
 #### Arguments
@@ -174,6 +174,10 @@ signIn(authURLCallback: AuthURLCallback, authorizationCode?: string, sessionStat
 
    This is the session state obtained from Asgardeo after a user signs in.
 
+3. userId: `string` (optional)
+
+    If you want to use the SDK to manage multiple user sessions, you can pass a unique ID here to generate an authorization URL specific to that user. This can be useful when this SDK is used in backend applications.
+
 #### Returns
 
 A Promise that resolves with a Promise that resolves with the [`NodeTokenResponse`](#NodeTokenResponse) object.
@@ -188,7 +192,7 @@ _Note: Make sure you call the same `signIn()` method in the `signInRedirectURL` 
 #### Example (Express JS)
 
 ```Typescript
-authClient.signIn(req.query.code, req.query.session_state).then(response => {
+authClient.signIn(req.query.code, req.query.session_state, req.query.user_id).then(response => {
         //URL property will available if the user has not been authenticated already
         if (response.hasOwnProperty('url')) {
             res.redirect(response.url)
@@ -205,7 +209,7 @@ authClient.signIn(req.query.code, req.query.session_state).then(response => {
 ### signOut
 
 ```TypeScript
-signOut(sessionId: string): Promise<string>
+signOut(userId: string): Promise<string>
 ```
 
 #### Returns
@@ -235,7 +239,7 @@ const signOutURL = await authClient.signOut("a2a2972c-51cd-5e9d-a9ae-058fae9f792
 ### getIDToken
 
 ```TypeScript
-getIDToken(sessionId: string): Promise<string>
+getIDToken(userId: string): Promise<string>
 ```
 
 #### Returns
@@ -258,7 +262,7 @@ const idToken = await authClient.getIDToken("a2a2972c-51cd-5e9d-a9ae-058fae9f792
 ### isAuthenticated
 
 ```TypeScript
-isAuthenticated(sessionId: string): Promise<boolean>
+isAuthenticated(userId: string): Promise<boolean>
 ```
 
 #### Returns

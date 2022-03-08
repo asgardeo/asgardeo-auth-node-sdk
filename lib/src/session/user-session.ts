@@ -29,20 +29,7 @@ export class UserSession {
         this._sessionStore = store;
     }
 
-    public async createUserSession(sub: string, sessionData: TokenResponse): Promise<string> {
-
-        const user_uuid = SessionUtils.createUUID(sub);
-
-        if (!user_uuid) {
-            return Promise.reject(
-                new AsgardeoAuthException(
-                    "NODE_CORE-CUS1-NF01",
-                    "createUID()",
-                    "Creating UID failed",
-                    "Could not create a UUID for the session."
-                )
-            );
-        }
+    public async createUserSession(userId: string, sessionData: TokenResponse): Promise<string> {
 
         //Append the expiary date
         const nodeSessionData : NodeSessionData = {
@@ -50,10 +37,10 @@ export class UserSession {
             createdAt: Date.now()
         }
 
-        const new_session = this._sessionStore.setData(user_uuid, JSON.stringify(nodeSessionData));
-        Logger.debug("New Session Created for " + user_uuid);
+        const new_session = this._sessionStore.setData(userId, JSON.stringify(nodeSessionData));
+        Logger.debug("New Session Created for " + userId);
 
-        return Promise.resolve(user_uuid);
+        return Promise.resolve(userId);
 
     }
 
@@ -81,8 +68,8 @@ export class UserSession {
         return Promise.resolve(sessionData);
     }
 
-    public async getUUID(sub: string): Promise<string> {
-        const uuid = SessionUtils.createUUID(sub);
+    public async getUUID(): Promise<string> {
+        const uuid = SessionUtils.createUUID();
 
         return uuid;
     }

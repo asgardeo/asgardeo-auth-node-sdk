@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@asgardeo/auth-js@^1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@asgardeo/auth-js/-/auth-js-1.0.2.tgz#67dff05bb616f9a276204a0f9dac127e2e8e2d1c"
-  integrity sha512-6MHmLwNfezFh8Ro7YS5yycudP1GqDwowdGpwsfeCQcolxYXpkoqk67X+Lo46GwV+Beyepuruj2WLP3fsxcfLlA==
+"@asgardeo/auth-js@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@asgardeo/auth-js/-/auth-js-1.0.3.tgz#89ea53c6f5f885e0aafff8ee2797b50d7e1a509d"
+  integrity sha512-MvPPkMc6iVNb+WdvXVIXCjSLFjpG4gih9mzFU4Wf4MU80sSUO3chnIZCqMcASY0I1Upp7ejDAY9luCX2xjHt6A==
 
 "@types/node@^17.0.15":
   version "17.0.15"
