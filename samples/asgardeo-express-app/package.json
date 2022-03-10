@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "serve": "nodemon index.js",
-    "debug": "set DEBUG=true && nodemon index.js"
+    "debug": "set DEBUG=true && nodemon index.js",
+    "clean": "rimraf node_modules && rimraf package-lock.json && rimraf yarn.lock"
   },
   "keywords": [],
   "author": "Asgardeo",
@@ -15,8 +16,9 @@
     "nodemon": "^2.0.15"
   },
   "dependencies": {
-    "@asgardeo/auth-node-sdk": "file:../lib",
+    "@asgardeo/auth-node-sdk": "^0.0.1",
     "cookie-parser": "^1.4.6",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "uuid": "^8.3.2"
   }
 }
