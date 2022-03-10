@@ -71,6 +71,7 @@ export class AsgardeoNodeCore<T> {
         }
 
         if (await this.isAuthenticated(userID)) {
+            console.log("Auth!")
             const sessionData: SessionData = await this._dataLayer.getSessionData(userID);
 
             return Promise.resolve({
@@ -191,14 +192,14 @@ export class AsgardeoNodeCore<T> {
                 return Promise.resolve(false);
             }
 
-            const isSessionValid = await SessionUtils.validateSession(await this._dataLayer.getSessionData(userId));
+            if (await SessionUtils.validateSession(await this._dataLayer.getSessionData(userId))) {
+                return Promise.resolve(true);
+            }
 
-            if (!isSessionValid) {
-                const refreshed_token = await this.refreshAccessToken(userId);
+            const refreshed_token = await this.refreshAccessToken(userId);
 
-                if (refreshed_token) {
-                    return Promise.resolve(true);
-                }
+            if (refreshed_token) {
+                return Promise.resolve(true);
             }
 
             this._dataLayer.removeSessionData(userId);
