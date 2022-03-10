@@ -18,7 +18,7 @@
 
 import { validate as uuidValidate, version as uuidVersion, v4 as uuidv4 } from "uuid";
 import { Logger } from ".";
-import { NodeSessionData } from "..";
+import { NodeSessionData, SessionData } from "..";
 import { UUID_VERSION } from "../constants";
 
 export class SessionUtils {
@@ -39,10 +39,10 @@ export class SessionUtils {
         }
     }
 
-    public static validateSession(sessionData: NodeSessionData): Promise<boolean> {
+    public static validateSession(sessionData: SessionData): Promise<boolean> {
         const currentTime = Date.now();
-        const expiryTimeStamp : number = currentTime + parseInt(sessionData.expiresIn) * 60 * 1000;
-        //If the expiry time is greater than the currnet time, then the cookie is still valid
+        const expiryTimeStamp : number = sessionData.created_at + parseInt(sessionData.expires_in) * 60 * 1000;
+        //If the expiry time is greater than the current time, then the cookie is still valid
         if (currentTime < expiryTimeStamp) {
             return Promise.resolve(true);
         } else {
