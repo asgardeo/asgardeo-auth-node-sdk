@@ -52,12 +52,7 @@ export class NodeCryptoUtils implements CryptoUtils<Buffer | string, jose.KeyLik
     }
 
     public parseJwk(key: Partial<JWKInterface>): Promise<jose.KeyLike | Uint8Array> {
-        return jose.importJWK({
-            alg: key.alg,
-            e: key.e,
-            kty: key.kty,
-            n: key.n
-        });
+        return jose.importJWK(key);
     }
 
     public verifyJwt(
