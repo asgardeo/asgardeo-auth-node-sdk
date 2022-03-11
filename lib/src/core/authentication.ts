@@ -19,6 +19,7 @@
 import {
     AsgardeoAuthClient,
     AuthClientConfig,
+    BasicUserInfo,
     CryptoUtils,
     SessionData,
     Store,
@@ -71,7 +72,6 @@ export class AsgardeoNodeCore<T> {
         }
 
         if (await this.isAuthenticated(userID)) {
-            console.log("Auth!")
             const sessionData: SessionData = await this._dataLayer.getSessionData(userID);
 
             return Promise.resolve({
@@ -206,15 +206,7 @@ export class AsgardeoNodeCore<T> {
             this._dataLayer.getTemporaryData(userId);
             return Promise.resolve(false);
         } catch (error) {
-            return Promise.reject(
-                new AsgardeoAuthException(
-                    "NODE_CORE-IA1-F01",
-                    "isAuthenticated()",
-                    "Authenticating the user failed",
-                    "Could not obtain the session data from the well-known endpoint" +
-                        "or could not obtain the user session from the Node Store."
-                )
-            );
+            return Promise.reject(error);
         }
     }
 
@@ -233,5 +225,9 @@ export class AsgardeoNodeCore<T> {
         }
 
         return Promise.resolve(signOutURL);
+    }
+
+    public async getBasicUserInfo(userId: string): Promise<BasicUserInfo> {
+        return this._auth.getBasicUserInfo(userId);
     }
 }

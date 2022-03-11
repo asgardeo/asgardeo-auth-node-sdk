@@ -16,7 +16,7 @@
  * under the License.
  */
 
-import { AuthClientConfig, Store, TokenResponse } from "@asgardeo/auth-js";
+import { AuthClientConfig, BasicUserInfo, Store, TokenResponse } from "@asgardeo/auth-js";
 import { AsgardeoNodeCore } from "./core"
 import { AuthURLCallback } from "./models";
 
@@ -158,5 +158,9 @@ export class AsgardeoNodeClient<T> {
      */
     public async getIDToken(userId: string): Promise<string> {
         return this._authCore.getIDToken(userId);
+    }
+
+    public async getBasicUserInfo(userId: string): Promise<BasicUserInfo> {
+        return this._authCore.getBasicUserInfo(userId);
     }
 }
