@@ -98,7 +98,8 @@
                             </p>
                         </div>
                         <% } else if (isAuthenticated && idToken) { %>
-                            <div id="logged-in-view">
+                            <div id="loading">Loading ...</div>
+                            <div id="logged-in-view" style="display:none;">
                                 <h2>Authentication Response</h2>
                                 <h4 className="sub-title">
                                     Derived by the&nbsp;
@@ -264,6 +265,10 @@
             document.getElementById("id-token-0").innerHTML = parsedIDToken.encoded[ 0 ];
             document.getElementById("id-token-1").innerHTML = parsedIDToken.encoded[ 1 ];
             document.getElementById("id-token-2").innerHTML = parsedIDToken.encoded[ 2 ];
+
+            document.getElementById("logged-in-view").style.display = "block";
+            document.getElementById("loading").style.display = "none";
+
         }
     </script>
 </body>
