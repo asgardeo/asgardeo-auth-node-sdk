@@ -29,15 +29,48 @@ const PORT = 3000;
 const app = express();
 app.use(cookieParser());
 
+app.set("view engine", "ejs");
+
+app.use("/", express.static("static"));
+
 //Initialize Asgardeo Auth Client
 const authClient = new AsgardeoNodeClient(config);
 
+const dataTemplate = {
+    isConfigPresent: Boolean(config && config.clientID && config.clientSecret),
+    isAuthenticated: false,
+    idToken: null,
+    error: false,
+    authenticateResponse: null
+}
+
 //Routes
-app.get("/", (req, res) => {
-    res.sendFile("index.html");
+app.get("/", async (req, res) => {
+    const data = { ...dataTemplate };
+    console.log(req.cookies.ASGARDEO_SESSION_ID);
+    try {
+        data.isAuthenticated = req.cookies.ASGARDEO_SESSION_ID
+            ? await authClient.isAuthenticated(req.cookies.ASGARDEO_SESSION_ID)
+            : false;
+
+        data.idToken = data.isAuthenticated
+            ? await authClient.getIDToken(req.cookies.ASGARDEO_SESSION_ID)
+            : null;
+
+        data.authenticateResponse = data.isAuthenticated
+            ? await authClient.getBasicUserInfo(req.cookies.ASGARDEO_SESSION_ID)
+            : {};
+
+        data.error = req.query.error === "true";
+
+        res.render("index", data);
+    } catch (error) {
+        console.log(error);
+        res.render("index", { ...data, error: true });
+    }
 });
 
-app.get("/login", (req, res) => {
+app.get("/auth/login", (req, res) => {
 
     let userID = req.cookies.ASGARDEO_SESSION_ID;
 
@@ -64,77 +97,27 @@ app.get("/login", (req, res) => {
             req.query.state
         )
         .then((response) => {
-            console.log(response);
-
-            if (response.accessToken) {
-                res.status(200).send(response);
-            } else {
-                res.status(401).send();
+            if (response.accessToken || response.idToken) {
+                res.redirect("/");
             }
-        }).catch((error) => {
-            res.status(400).send(error);
+        }).catch(() => {
+            res.redirect("/?error=true");
         });
 });
 
-app.get("/id", (req, res) => {
-    //If the session cookie is not there in the request, it is not possible to get the session from the store.
-    //Hence, unauthenticated.
+app.get("/auth/logout", (req, res) => {
     if (req.cookies.ASGARDEO_SESSION_ID === undefined) {
-        res.send("Unauthenticated");
-        //You may redirect the user to login endpoint here.
-        // res.status(301).redirect("/login");
-    } else {
-        authClient
-            .getIDToken(req.cookies.ASGARDEO_SESSION_ID)
-            .then((response) => {
-                res.send(response);
-            })
-            .catch((err) => {
-                console.log(err);
-                res.send(err);
-            });
-    }
-});
-
-app.get("/isauth", (req, res) => {
-    if (req.cookies.ASGARDEO_SESSION_ID === undefined) {
-        res.send("Unauthenticated");
-    } else {
-        authClient
-            .isAuthenticated(req.cookies.ASGARDEO_SESSION_ID)
-            .then((response) => {
-                res.send(response);
-            })
-            .catch((err) => {
-                console.log(err);
-                res.send(err);
-            });
-    }
-});
-
-//A sample protected route
-app.get("/protected", (req, res) => {
-    if (req.cookies.ASGARDEO_SESSION_ID === undefined) {
-        res.send("Unauthenticated");
-    } else {
-        res.status(200).send("Protected Route");
-    }
-});
-
-app.get("/logout", (req, res) => {
-    if (req.cookies.ASGARDEO_SESSION_ID === undefined) {
-        res.send("Unauthenticated");
+        res.redirect("/?error=true");
     } else {
         authClient
             .signOut(req.cookies.ASGARDEO_SESSION_ID)
-            .then((response) => {
+            .then((url) => {
                 //Invalidate the session cookie
                 res.cookie("ASGARDEO_SESSION_ID", null, { maxAge: 0 });
-                res.redirect(response);
+                res.redirect(url);
             })
-            .catch((err) => {
-                console.log(err);
-                res.send(err);
+            .catch(() => {
+                res.redirect("/?error=true");
             });
     }
 });
