@@ -1,0 +1,271 @@
+<!--
+ * Copyright (c) 2022, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ -->
+
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="referrer" content="no-referrer" />
+
+    <title>Node.js Authentication Example - Using Asgardeo Auth Node SDK</title>
+
+    <link href="app.css" rel="stylesheet" type="text/css" />
+
+    <style type="text/css">
+        .json-formatter-row .json-formatter-string,
+        .json-formatter-row .json-formatter-stringifiable {
+            white-space: unset !important;
+        }
+
+        .json-formatter-dark.json-formatter-row .json-formatter-row {
+            line-height: 1.5;
+        }
+
+        .json-container {
+            background: #272822;
+            padding: 20px;
+        }
+
+        .json-formatter-string {
+            color: #fd971f !important;
+        }
+
+        .json-formatter-key,
+        .json-formatter-bracket {
+            color: #f9f8f5 !important;
+            letter-spacing: 0.5px;
+        }
+
+        .json-formatter-number {
+            color: #cc6633 !important;
+        }
+
+        .code {
+            line-height: 1.5;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root">
+        <div class="container">
+            <div class="header-title">
+                <h1>Node.js Authentication Sample</h1>
+            </div>
+            <div class="content">
+                <% if (error) { %>
+                    <div id="error">
+                        <div class="segment-form">
+                            <div class="ui visible negative message">
+                                <div class="header"><b>Authentication Error!</b></div>
+                                <p>Something went wrong during the authentication process.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <% } %>
+                    <% if(!isConfigPresent) { %>
+                        <div id="missing-config">
+                            <h2>You need to update the Client ID to proceed.</h2>
+                            <p>
+                                Please open the <b>index.html</b> file using an editor and scroll down to the
+                                <b>script</b> tag at the the end of the <b>body</b> tag, find the
+                                <code>authConfig</code>,
+                                and update the <code>clientID</code> value with the registered application's client ID.
+                            </p>
+                            <p>
+                                Visit repo
+                                <a
+                                    href="https://github.com/asgardeo/asgardeo-auth-node-sdk/tree/master/samples/asgardeo-express-app">
+                                    README
+                                </a>
+                                for more details.
+                            </p>
+                        </div>
+                        <% } else if (isAuthenticated && idToken) { %>
+                            <div id="logged-in-view">
+                                <h2>Authentication Response</h2>
+                                <h4 className="sub-title">
+                                    Derived by the&nbsp;
+                                    <code className="inline-code-block">
+                                <a href="https://www.npmjs.com/package/@asgardeo/auth-node/v/latest" target="_blank">
+                                    @asgardeo/auth-node
+                                </a> </code>&nbsp;SDK
+                                </h4>
+                                <div class="json">
+                                    <div id="authentication-response" class="json-container"></div>
+                                </div>
+
+                                <h2 class="mb-0 mt-4">ID token</h2>
+
+                                <div class="row">
+                                    <div class="column">
+                                        <h5><b>Encoded</b></h5>
+                                        <div class="code">
+                                            <code>
+                                        <span class="id-token-0" id="id-token-0"></span>.<span
+                                            class="id-token-1"
+                                            id="id-token-1"
+                                        ></span
+                                        >.<span class="id-token-2" id="id-token-2"></span>
+                                    </code>
+                                        </div>
+                                    </div>
+                                    <div class="column">
+                                        <div class="json">
+                                            <h5><b>Decoded:</b> Header</h5>
+                                            <div id="id-token-header" class="json-container"></div>
+                                        </div>
+
+                                        <div class="json">
+                                            <h5><b>Decoded:</b> Payload</h5>
+                                            <div id="id-token-payload" class="json-container"></div>
+                                        </div>
+
+                                        <div class="json">
+                                            <h5>Signature</h5>
+                                            <div class="code">
+                                                <code>
+                                            HMACSHA256(
+                                            <br />
+                                            &nbsp;&nbsp;<span class="id-token-0"
+                                                >base64UrlEncode( <span class="id-token-1">header</span>)</span
+                                            >
+                                            + "." + <br />
+                                            &nbsp;&nbsp;<span class="id-token-0"
+                                                >base64UrlEncode( <span class="id-token-1">payload</span>)</span
+                                            >,&nbsp; <span class="id-token-1">your-256-bit-secret</span> <br />
+                                            );
+                                        </code>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <form action="auth/logout">
+                                    <button class="btn primary mt-4" type="submit">Logout</button>
+                                </form>
+                            </div>
+                            <% } else { %>
+                                <div id="logged-out-view">
+                                    <div class="home-image">
+                                        <img src="images/node-js.svg" class="js-logo-image logo" />
+                                    </div>
+                                    <h3>
+                                        Sample demo to showcase authentication for a Node.js application <br />
+                                        via the OpenID Connect Authorization Code flow, <br />
+                                        which is integrated using the
+                                        <a href="https://github.com/asgardeo/asgardeo-auth-node-sdk" target="_blank">
+                                            Asgardeo Auth Node SDK</a>.
+                                    </h3>
+                                    <form action="auth/login">
+                                        <button class="btn primary" type="submit">Login</button>
+                                    </form>
+                                </div>
+                                <% } %>
+            </div>
+        </div>
+
+        <img src="images/footer.png" class="footer-image" />
+    </div>
+
+    <!-- Add Asgardeo OIDC JS -->
+    <script src="https://unpkg.com/json-formatter-js@latest/dist/json-formatter.umd.js"></script>
+    <script>
+        function parseIdToken(idToken) {
+            if (!idToken) {
+                return;
+            }
+
+            if (typeof idToken !== "string") {
+                idToken = JSON.stringify(idToken);
+            }
+
+            const idTokenSplit = idToken.split(".");
+            let idTokenObject = {
+                encoded: [],
+                decoded: []
+            };
+
+            idTokenSplit.forEach(function (element) {
+                idTokenObject[ "encoded" ].push(element);
+            });
+
+            idTokenObject[ "decoded" ].push(JSON.parse(atob(idTokenObject.encoded[ 0 ])));
+            idTokenObject[ "decoded" ].push(JSON.parse(atob(idTokenObject.encoded[ 1 ])));
+
+            var sub = idTokenObject[ "decoded" ][ 1 ] && idTokenObject[ "decoded" ][ 1 ]?.sub?.split("/");
+
+            if (sub.length >= 2) {
+                sub.shift();
+                idTokenObject[ "decoded" ][ 1 ].sub = sub.join("/");
+            }
+
+            const groups = [];
+            idTokenObject[ "decoded" ][ 1 ] &&
+                typeof idTokenObject[ "decoded" ][ 1 ]?.groups === "string" &&
+                groups.push(idTokenObject[ "decoded" ][ 1 ]?.groups);
+
+            idTokenObject[ "decoded" ][ 1 ] &&
+                typeof idTokenObject[ "decoded" ][ 1 ]?.groups !== "string" &&
+                idTokenObject[ "decoded" ][ 1 ]?.groups?.forEach((group) => {
+                    const groupArrays = group.split("/");
+
+                    if (groupArrays.length >= 2) {
+                        groupArrays.shift();
+                        groups.push(groupArrays.join("/"));
+                    } else {
+                        groups.push(group);
+                    }
+                });
+
+            if (idTokenObject[ "decoded" ][ 1 ]?.groups) {
+                idTokenObject[ "decoded" ][ 1 ].groups = groups;
+            }
+
+            return idTokenObject;
+        }
+
+        var idToken = "<%=idToken%>";
+        var authenticationResponseViewBox = document.getElementById("authentication-response");
+        var idTokenHeaderViewBox = document.getElementById("id-token-header");
+        var idTokenPayloadViewBox = document.getElementById("id-token-payload");
+
+        if ("<%=isAuthenticated%>" === "true" && idToken) {
+            var parsedIDToken = parseIdToken(idToken);
+            var formattedAuthenticateResponse = new JSONFormatter(<%-JSON.stringify(authenticateResponse)%>, 1, {
+                theme: "dark"
+            });
+            var formattedDecodedIdTokenHeader = new JSONFormatter(parsedIDToken.decoded[ 0 ], 1, { theme: "dark" });
+            var formattedDecodedIdTokenPayload = new JSONFormatter(parsedIDToken.decoded[ 1 ], 1, { theme: "dark" });
+
+            authenticationResponseViewBox.innerHTML = "";
+            idTokenHeaderViewBox.innerHTML = "";
+            idTokenPayloadViewBox.innerHTML = "";
+
+            authenticationResponseViewBox.appendChild(formattedAuthenticateResponse.render());
+            idTokenHeaderViewBox.appendChild(formattedDecodedIdTokenHeader.render());
+            idTokenPayloadViewBox.appendChild(formattedDecodedIdTokenPayload.render());
+
+            document.getElementById("id-token-0").innerHTML = parsedIDToken.encoded[ 0 ];
+            document.getElementById("id-token-1").innerHTML = parsedIDToken.encoded[ 1 ];
+            document.getElementById("id-token-2").innerHTML = parsedIDToken.encoded[ 2 ];
+        }
+    </script>
+</body>
+
+</html>
