@@ -81,7 +81,7 @@ app.get("/auth/login", (req, res) => {
     const redirectCallback = (url) => {
         if (url) {
             // Make sure you use the httpOnly and sameSite to prevent from cross-site request forgery (CSRF) attacks.
-            res.cookie("ASGARDEO_SESSION_ID", userID, { maxAge: 900000, httpOnly: true, sameSite: "strict" });
+            res.cookie("ASGARDEO_SESSION_ID", userID, { maxAge: 900000, httpOnly: true, sameSite: "lax" });
             res.redirect(url);
 
             return;
