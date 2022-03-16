@@ -18,6 +18,7 @@
 
 import {
     AsgardeoAuthClient,
+    AsgardeoAuthException,
     AuthClientConfig,
     BasicUserInfo,
     CryptoUtils,
@@ -26,7 +27,6 @@ import {
     TokenResponse
 } from "@asgardeo/auth-js";
 import { DataLayer } from "@asgardeo/auth-js/dist/src/data";
-import { AsgardeoAuthException } from "../exception";
 import { AuthURLCallback } from "../models";
 import { MemoryCacheStore } from "../stores";
 import { Logger, SessionUtils } from "../utils";
@@ -63,8 +63,7 @@ export class AsgardeoNodeCore<T> {
         if (!userID) {
             return Promise.reject(
                 new AsgardeoAuthException(
-                    "NODE_CORE-SI1-NF01",
-                    "signIn()",
+                    "NODE-AUTH_CORE-SI-NF01",
                     "No user ID was provided.",
                     "Unable to sign in the user as no user ID was provided."
                 )
@@ -91,8 +90,7 @@ export class AsgardeoNodeCore<T> {
             if (!authURLCallback || typeof authURLCallback !== "function") {
                 return Promise.reject(
                     new AsgardeoAuthException(
-                        "NODE_CORE-SI1-NF02",
-                        "signIn()",
+                        "NODE-AUTH_CORE-SI-NF02",
                         "Invalid AuthURLCallback function.",
                         "The AuthURLCallback is not defined or is not a function."
                     )
@@ -111,22 +109,9 @@ export class AsgardeoNodeCore<T> {
                 session: "",
                 tokenType: ""
             });
-        } else {
-            const tokenResponse = await this.requestAccessToken(authorizationCode, sessionState ?? "", userID, state);
-            if (tokenResponse) {
-                return Promise.resolve(tokenResponse);
-            }
         }
 
-        return Promise.reject(
-            new AsgardeoAuthException(
-                "NODE_CORE-SI1-NF01",
-                "signIn()",
-                "Access token or decoded token failed.",
-                "No token endpoint was found in the OIDC provider meta data returned by the well-known endpoint " +
-                    "or the token endpoint passed to the SDK is empty."
-            )
-        );
+        return this.requestAccessToken(authorizationCode, sessionState ?? "", userID, state);
     }
 
     public async getAuthURL(userId: string, signInConfig?: Record<string, string | boolean>): Promise<string> {
@@ -137,10 +122,9 @@ export class AsgardeoNodeCore<T> {
         } else {
             return Promise.reject(
                 new AsgardeoAuthException(
-                    "NODE_CORE-GAU1-NF01",
-                    "getAuthURL()",
+                    "NODE-AUTH_CORE-GAU-NF01",
                     "Getting Authorization URL failed.",
-                    "No authorization URL was returned by the well-known endpoint "
+                    "No authorization URL was returned by the Asgardeo Auth JS SDK."
                 )
             );
         }
@@ -160,8 +144,7 @@ export class AsgardeoNodeCore<T> {
         if (!is_logged_in) {
             return Promise.reject(
                 new AsgardeoAuthException(
-                    "NODE_CORE-GIT1-NF01",
-                    "getIDToken()",
+                    "NODE-AUTH_CORE-GIT-NF01",
                     "The user is not logged in.",
                     "No session ID was found for the requested user. User is not logged in."
                 )
@@ -173,10 +156,9 @@ export class AsgardeoNodeCore<T> {
         } else {
             return Promise.reject(
                 new AsgardeoAuthException(
-                    "NODE_CORE-GIT1-NF02",
-                    "getIDToken()",
+                    "NODE-AUTH_CORE-GIT-NF02",
                     "Requesting ID Token Failed",
-                    "No ID Token was returned by the well-known endpoint."
+                    "No ID Token was returned by the Asgardeo Auth JS SDK."
                 )
             );
         }
@@ -216,10 +198,9 @@ export class AsgardeoNodeCore<T> {
         if (!signOutURL) {
             return Promise.reject(
                 new AsgardeoAuthException(
-                    "NODE_CORE-SO1-NF01",
-                    "signOut()",
+                    "NODE-AUTH_CORE-SO-NF01",
                     "Signing out the user failed.",
-                    "Could not obtain the signout URL from the server."
+                    "Could not obtain the sign-out URL from the server."
                 )
             );
         }
