@@ -107,6 +107,7 @@ app.get("/auth/login", (req, res) => {
 });
 
 app.get("/auth/logout", (req, res) => {
+    
     if (req.cookies.ASGARDEO_SESSION_ID === undefined) {
         res.redirect("/?error=true");
     } else {
@@ -117,7 +118,8 @@ app.get("/auth/logout", (req, res) => {
                 res.cookie("ASGARDEO_SESSION_ID", null, { maxAge: 0 });
                 res.redirect(url);
             })
-            .catch(() => {
+            .catch((err) => {
+                console.log(err)
                 res.redirect("/?error=true");
             });
     }
