@@ -1,0 +1,8 @@
+{
+    "clientID": "",
+    "clientSecret": "",
+    "serverOrigin": "",
+    "signInRedirectURL": "http://localhost:3000/auth/login",
+    "signOutRedirectURL": "http://localhost:3000",
+    "scope": ["openid", "profile"]
+}

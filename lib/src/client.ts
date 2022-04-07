@@ -16,9 +16,9 @@
  * under the License.
  */
 
-import { AuthClientConfig, Store } from "@asgardeo/auth-js";
+import { AuthClientConfig, BasicUserInfo, Store, TokenResponse } from "@asgardeo/auth-js";
 import { AsgardeoNodeCore } from "./core"
-import { AuthURLCallback, NodeTokenResponse } from "./models";
+import { AuthURLCallback } from "./models";
 
 /**
  * This class provides the necessary methods needed to implement authentication.
@@ -26,13 +26,11 @@ import { AuthURLCallback, NodeTokenResponse } from "./models";
  * @export
  * @class AsgardeoNodeClient
 */
-export class AsgardeoNodeClient<T>{
-
+export class AsgardeoNodeClient<T> {
     private _authCore: AsgardeoNodeCore<T>;
 
-
     /**
-    * This is the constructor method that returns an instance of the .
+    * This is the constructor method that returns an instance of the `AsgardeoNodeClient` class.
     *
     * @param {AuthClientConfig<T>} config - The configuration object.
     * @param {Store} store - The store object.
@@ -46,7 +44,7 @@ export class AsgardeoNodeClient<T>{
            clientID: "client ID",
            serverOrigin: "https://api.asgardeo.io/t/<org_name>"
        };
-    * const auth = new AsgardeoNodeClient(_condfig,_store);
+    * const auth = new AsgardeoNodeClient(_config,_store);
     * ```
     *
     * @link https://github.com/asgardeo/asgardeo-auth-js-sdk/tree/master#constructor
@@ -63,6 +61,7 @@ export class AsgardeoNodeClient<T>{
      * @param {String} sessionState - The session state obtained from Asgardeo after a user signs in.
      * @param {string} userID - (Optional) A unique ID of the user to be authenticated. This is useful in multi-user
      * scenarios where each user should be uniquely identified.
+     * @param {string} state - The state parameter in the redirect URL.
      *
      * @return {Promise<URLResponse | NodeTokenResponse>} - A Promise that resolves with the
      * [`URLResponse`](#URLResponse) object or a Promise that resolves with
@@ -86,14 +85,16 @@ export class AsgardeoNodeClient<T>{
      *
      * @memberof AsgardeoNodeClient
      *
-    */
+     */
     public async signIn(
         authURLCallback: AuthURLCallback,
+        userId: string,
         authorizationCode?: string,
         sessionState?: string,
-        userId?: string
-    ): Promise<NodeTokenResponse> {
-        return this._authCore.signIn(authURLCallback, authorizationCode, sessionState, userId);
+        state?: string,
+        signInConfig?: Record<string, string | boolean>
+    ): Promise<TokenResponse> {
+        return this._authCore.signIn(authURLCallback, userId, authorizationCode, sessionState, state, signInConfig);
     }
 
     /**
@@ -112,51 +113,54 @@ export class AsgardeoNodeClient<T>{
      *
      * @memberof AsgardeoNodeClient
      *
-    */
+     */
     public async signOut(userId: string): Promise<string> {
         return this._authCore.signOut(userId);
     }
 
-
     /**
-    * This method returns a boolean value indicating if the user is authenticated or not.
-    * @param {string} userId - The userId of the user.
-    * (If you are using ExpressJS, you may get this from the request cookies)
-    *
-    * @return { Promise<boolean>} -A boolean value that indicates of the user is authenticated or not.
-    *
-    * @example
-    * ```
-    * const isAuth = await authClient.isAuthenticated("a2a2972c-51cd-5e9d-a9ae-058fae9f7927");
-    * ```
-    *
-    * @link https://github.com/asgardeo/asgardeo-auth-js-sdk/tree/master#isAuthenticated
-    *
-    * @memberof AsgardeoNodeClient
-    *
-   */
+     * This method returns a boolean value indicating if the user is authenticated or not.
+     * @param {string} userId - The userId of the user.
+     * (If you are using ExpressJS, you may get this from the request cookies)
+     *
+     * @return { Promise<boolean>} -A boolean value that indicates of the user is authenticated or not.
+     *
+     * @example
+     * ```
+     * const isAuth = await authClient.isAuthenticated("a2a2972c-51cd-5e9d-a9ae-058fae9f7927");
+     * ```
+     *
+     * @link https://github.com/asgardeo/asgardeo-auth-js-sdk/tree/master#isAuthenticated
+     *
+     * @memberof AsgardeoNodeClient
+     *
+     */
     public async isAuthenticated(userId: string): Promise<boolean> {
         return this._authCore.isAuthenticated(userId);
     }
 
     /**
-   * This method returns the id token.
-   * @param {string} userId - The userId of the user.
-   * (If you are using ExpressJS, you may get this from the request cookies)
-   *
-   * @return {Promise<string>} -A Promise that resolves with the ID Token.
-   *
-   * @example
-   * ```
-   * const isAuth = await authClient.getIDToken("a2a2972c-51cd-5e9d-a9ae-058fae9f7927");
-   * ```
-   *
-   * @link https://github.com/asgardeo/asgardeo-auth-js-sdk/tree/master#getIDToken
-   *
-   * @memberof AsgardeoNodeClient
-   *
-  */
+     * This method returns the id token.
+     * @param {string} userId - The userId of the user.
+     * (If you are using ExpressJS, you may get this from the request cookies)
+     *
+     * @return {Promise<string>} -A Promise that resolves with the ID Token.
+     *
+     * @example
+     * ```
+     * const isAuth = await authClient.getIDToken("a2a2972c-51cd-5e9d-a9ae-058fae9f7927");
+     * ```
+     *
+     * @link https://github.com/asgardeo/asgardeo-auth-js-sdk/tree/master#getIDToken
+     *
+     * @memberof AsgardeoNodeClient
+     *
+     */
     public async getIDToken(userId: string): Promise<string> {
         return this._authCore.getIDToken(userId);
+    }
+
+    public async getBasicUserInfo(userId: string): Promise<BasicUserInfo> {
+        return this._authCore.getBasicUserInfo(userId);
     }
 }
