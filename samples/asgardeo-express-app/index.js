@@ -23,7 +23,9 @@ const config = require("./config.json");
 const { v4: uuidv4 } = require("uuid");
 const rateLimit = require('express-rate-limit');
 
-const limiter = rateLimit();
+const limiter = rateLimit({
+    max: 100
+});
 
 //Constants
 const PORT = 3000;
