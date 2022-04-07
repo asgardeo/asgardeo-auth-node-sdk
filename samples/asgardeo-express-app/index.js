@@ -21,13 +21,18 @@ const cookieParser = require("cookie-parser");
 const { AsgardeoNodeClient } = require("@asgardeo/auth-node-sdk");
 const config = require("./config.json");
 const { v4: uuidv4 } = require("uuid");
+const rateLimit = require('express-rate-limit');
+
+const limiter = rateLimit();
 
 //Constants
 const PORT = 3000;
 
 //Initialize Express App
 const app = express();
+
 app.use(cookieParser());
+app.use(limiter);
 
 app.set("view engine", "ejs");
 
@@ -47,7 +52,7 @@ const dataTemplate = {
 //Routes
 app.get("/", async (req, res) => {
     const data = { ...dataTemplate };
-    console.log(req.cookies.ASGARDEO_SESSION_ID);
+
     try {
         data.isAuthenticated = req.cookies.ASGARDEO_SESSION_ID
             ? await authClient.isAuthenticated(req.cookies.ASGARDEO_SESSION_ID)
@@ -65,7 +70,6 @@ app.get("/", async (req, res) => {
 
         res.render("index", data);
     } catch (error) {
-        console.log(error);
         res.render("index", { ...data, error: true });
     }
 });
