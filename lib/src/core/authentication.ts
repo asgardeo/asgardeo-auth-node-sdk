@@ -22,6 +22,10 @@ import {
     AuthClientConfig,
     BasicUserInfo,
     CryptoUtils,
+    CustomGrantConfig,
+    DecodedIDTokenPayload,
+    FetchResponse,
+    OIDCEndpoints,
     SessionData,
     Store,
     TokenResponse
@@ -211,4 +215,45 @@ export class AsgardeoNodeCore<T> {
     public async getBasicUserInfo(userId: string): Promise<BasicUserInfo> {
         return this._auth.getBasicUserInfo(userId);
     }
+
+    public async getOIDCServiceEndpoints(): Promise<OIDCEndpoints>{
+        return this._auth.getOIDCServiceEndpoints();
+    }
+
+    public async getDecodedIDToken(userId?: string): Promise<DecodedIDTokenPayload>{
+        return this._auth.getDecodedIDToken(userId);
+    }
+
+    public async getAccessToken(userId?: string): Promise<string>{
+        return this._auth.getAccessToken(userId);
+    }
+
+    public async requestCustomGrant(config: CustomGrantConfig, userId?: string): Promise<TokenResponse | FetchResponse>{
+        return this._auth.requestCustomGrant(config, userId);
+    }
+
+    public async getPKCECode(state: string, userId?: string): Promise<string>{
+        return this._auth.getPKCECode(state, userId);
+    }
+
+    public async setPKCECode(pkce: string, state: string, userId?: string): Promise<void>{
+        return this._auth.setPKCECode(pkce, state, userId);
+    }
+
+    public async updateConfig(config: Partial<AuthClientConfig<T>>): Promise<void>{
+        return this._auth.updateConfig(config);
+    }
+
+    public async revokeAccessToken(userId?: string): Promise<FetchResponse>{
+        return this._auth.revokeAccessToken(userId);
+    }
+
+    public static didSignOutFail(signOutRedirectURL: string): boolean{
+        return AsgardeoNodeCore.didSignOutFail(signOutRedirectURL);
+    }
+
+    public static isSignOutSuccessful(signOutRedirectURL: string): boolean{
+        return AsgardeoNodeCore.isSignOutSuccessful(signOutRedirectURL);
+    } 
+    
 }

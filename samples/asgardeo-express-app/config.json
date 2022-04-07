@@ -1,7 +1,7 @@
 {
-    "clientID": "_1d5iHE2DzskjgZWHOsjCazhB_ga",
-    "clientSecret": "5XinOZ5syWId34TxJ0Rt9_f9Hpsa",
-    "serverOrigin": "https://dev.api.asgardeo.io/t/sdktests",
+    "clientID": "",
+    "clientSecret": "",
+    "serverOrigin": "",
     "signInRedirectURL": "http://localhost:3000/auth/login",
     "signOutRedirectURL": "http://localhost:3000",
     "scope": ["openid", "profile"]
