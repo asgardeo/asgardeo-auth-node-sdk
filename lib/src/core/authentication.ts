@@ -31,7 +31,6 @@ import {
     Store,
     TokenResponse
 } from "@asgardeo/auth-js";
-// import { DataLayer } from "@asgardeo/auth-js/dist/src/data";
 import { AuthURLCallback } from "../models";
 import { MemoryCacheStore } from "../stores";
 import { Logger, SessionUtils } from "../utils";
