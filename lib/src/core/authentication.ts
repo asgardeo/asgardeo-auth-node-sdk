@@ -23,6 +23,7 @@ import {
     BasicUserInfo,
     CryptoUtils,
     CustomGrantConfig,
+    DataLayer, //TODO: Different references
     DecodedIDTokenPayload,
     FetchResponse,
     OIDCEndpoints,
@@ -30,7 +31,7 @@ import {
     Store,
     TokenResponse
 } from "@asgardeo/auth-js";
-import { DataLayer } from "@asgardeo/auth-js/dist/src/data";
+// import { DataLayer } from "@asgardeo/auth-js/dist/src/data";
 import { AuthURLCallback } from "../models";
 import { MemoryCacheStore } from "../stores";
 import { Logger, SessionUtils } from "../utils";
@@ -230,14 +231,6 @@ export class AsgardeoNodeCore<T> {
 
     public async requestCustomGrant(config: CustomGrantConfig, userId?: string): Promise<TokenResponse | FetchResponse>{
         return this._auth.requestCustomGrant(config, userId);
-    }
-
-    public async getPKCECode(state: string, userId?: string): Promise<string>{
-        return this._auth.getPKCECode(state, userId);
-    }
-
-    public async setPKCECode(pkce: string, state: string, userId?: string): Promise<void>{
-        return this._auth.setPKCECode(pkce, state, userId);
     }
 
     public async updateConfig(config: Partial<AuthClientConfig<T>>): Promise<void>{
