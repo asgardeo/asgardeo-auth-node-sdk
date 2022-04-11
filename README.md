@@ -92,7 +92,7 @@ const authClient = new AsgardeoAuth(config);
 // Implement a login route.
 // For this example, we will define the login route as '/auth/login'. 
 // You can change this to match your use case.
-app.get("/auth/login", (req, res) => {
+app.get("/auth/sign-in", (req, res) => {
 
     // Check if the incoming request has a session ID which contains the user ID.
     let userID = req.cookies.ASGARDEO_SESSION_ID;
