@@ -85,21 +85,9 @@ const config = {
 const PORT = 3000;
 const app = express();
 app.use(cookieParser());
-app.set("view engine", "ejs");
-app.use("/", express.static("static"));
 
 // Instantiate the AsgardeoAuthClient and pass the config object as an argument into the constructor.
 const authClient = new AsgardeoAuth(config);
-
-// Define the data template needed for the view engine
-const dataTemplate = {
-    isConfigPresent: Boolean(config && config.clientID && config.clientSecret),
-    isAuthenticated: false,
-    idToken: null,
-    error: false,
-    authenticateResponse: null
-}
-
 
 // Implement a login route.
 // For this example, we will define the login route as '/auth/login'. 
@@ -136,11 +124,15 @@ app.get("/auth/login", (req, res) => {
         )
         .then((response) => {
             if (response.accessToken || response.idToken) {
-                res.redirect("/");
+                // If the accessToken or the idToken is present, redirect to the homepage.
+                // In this case, the home route is defined as `/home`.
+                res.redirect("/home");
             }
         }).catch((err) => {
             console.log(err);
-            res.redirect("/?error=true");
+            // If there is an error, you can redirect to an error page
+            // In this case, the home route is defined as `/errorPage`.
+            res.redirect("/errorPage");
         });
 
     // Now you have successfully implemented a login endpoint with Asgardeo Node SDK.
