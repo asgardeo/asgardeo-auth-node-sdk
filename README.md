@@ -90,7 +90,7 @@ app.use(cookieParser());
 const authClient = new AsgardeoAuth(config);
 
 // Implement a login route.
-// For this example, we will define the login route as '/auth/login'. 
+// For this example, we will define the login route as '/auth/sign-in'. 
 // You can change this to match your use case.
 app.get("/auth/sign-in", (req, res) => {
 
