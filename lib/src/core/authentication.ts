@@ -23,7 +23,7 @@ import {
     BasicUserInfo,
     CryptoUtils,
     CustomGrantConfig,
-    DataLayer, //TODO: Different references
+    DataLayer,
     DecodedIDTokenPayload,
     FetchResponse,
     OIDCEndpoints,
