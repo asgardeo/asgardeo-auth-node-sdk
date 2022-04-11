@@ -21,13 +21,21 @@ const cookieParser = require("cookie-parser");
 const { AsgardeoNodeClient } = require("@asgardeo/auth-node-sdk");
 const config = require("./config.json");
 const { v4: uuidv4 } = require("uuid");
+const rateLimit = require("express-rate-limit");
+
+const limiter = rateLimit({
+    windowMs: 1 * 60 * 1000, // 1 minute
+    max: 5
+});
 
 //Constants
 const PORT = 3000;
 
 //Initialize Express App
 const app = express();
+
 app.use(cookieParser());
+app.use(limiter);
 
 app.set("view engine", "ejs");
 
@@ -42,20 +50,18 @@ const dataTemplate = {
     idToken: null,
     error: false,
     authenticateResponse: null
-}
+};
 
 //Routes
 app.get("/", async (req, res) => {
     const data = { ...dataTemplate };
-    console.log(req.cookies.ASGARDEO_SESSION_ID);
+
     try {
         data.isAuthenticated = req.cookies.ASGARDEO_SESSION_ID
             ? await authClient.isAuthenticated(req.cookies.ASGARDEO_SESSION_ID)
             : false;
 
-        data.idToken = data.isAuthenticated
-            ? await authClient.getIDToken(req.cookies.ASGARDEO_SESSION_ID)
-            : null;
+        data.idToken = data.isAuthenticated ? await authClient.getIDToken(req.cookies.ASGARDEO_SESSION_ID) : null;
 
         data.authenticateResponse = data.isAuthenticated
             ? await authClient.getBasicUserInfo(req.cookies.ASGARDEO_SESSION_ID)
@@ -65,13 +71,11 @@ app.get("/", async (req, res) => {
 
         res.render("index", data);
     } catch (error) {
-        console.log(error);
         res.render("index", { ...data, error: true });
     }
 });
 
 app.get("/auth/login", (req, res) => {
-
     let userID = req.cookies.ASGARDEO_SESSION_ID;
 
     if (!userID) {
@@ -89,21 +93,14 @@ app.get("/auth/login", (req, res) => {
     };
 
     authClient
-        .signIn(
-            redirectCallback,
-            userID,
-            req.query.code,
-            req.query.session_state,
-            req.query.state
-        )
+        .signIn(redirectCallback, userID, req.query.code, req.query.session_state, req.query.state)
         .then((response) => {
             if (response.accessToken || response.idToken) {
                 res.redirect("/");
             }
         }).catch((err) => {
-            console.log(err);
             res.redirect("/?error=true");
-        });
+        })
 });
 
 app.get("/auth/logout", (req, res) => {
