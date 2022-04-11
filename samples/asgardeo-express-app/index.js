@@ -98,10 +98,9 @@ app.get("/auth/login", (req, res) => {
             if (response.accessToken || response.idToken) {
                 res.redirect("/");
             }
-        })
-        .catch(() => {
+        }).catch((err) => {
             res.redirect("/?error=true");
-        });
+        })
 });
 
 app.get("/auth/logout", (req, res) => {

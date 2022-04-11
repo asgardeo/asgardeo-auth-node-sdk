@@ -16,7 +16,16 @@
  * under the License.
  */
 
-import { AuthClientConfig, BasicUserInfo, Store, TokenResponse } from "@asgardeo/auth-js";
+import {
+    AuthClientConfig,
+    BasicUserInfo,
+    CustomGrantConfig,
+    DecodedIDTokenPayload,
+    FetchResponse,
+    OIDCEndpoints,
+    Store,
+    TokenResponse
+} from "@asgardeo/auth-js";
 import { AsgardeoNodeCore } from "./core"
 import { AuthURLCallback } from "./models";
 
@@ -160,7 +169,221 @@ export class AsgardeoNodeClient<T> {
         return this._authCore.getIDToken(userId);
     }
 
+    /**
+     * This method returns an object containing basic user information obtained from the id token.
+     * @param {string} userId - The userId of the user.
+     * (If you are using ExpressJS, you may get this from the request cookies)
+     *
+     * @return {Promise<string>} -A Promise that resolves with the 
+     * An object containing basic user information obtained from the id token.
+     *
+     * @example
+     * ```
+     * const basicInfo = await authClient.getBasicUserInfo("a2a2972c-51cd-5e9d-a9ae-058fae9f7927");
+     * ```
+     *
+     * @link https://github.com/asgardeo/asgardeo-auth-js-sdk/tree/master#getBasicUserInfo
+     *
+     * @memberof AsgardeoNodeClient
+     *
+     */
     public async getBasicUserInfo(userId: string): Promise<BasicUserInfo> {
         return this._authCore.getBasicUserInfo(userId);
     }
+
+    /**
+     * This method returns an object containing the OIDC service endpoints returned by the `.well-known` endpoint.
+     * @return {Promise<OIDCEndpoints>} -A Promise that resolves with 
+     * an object containing the OIDC service endpoints returned by the `.well-known` endpoint.
+     *
+     * @example
+     * ```
+     * const oidcEndpoints = await auth.getOIDCServiceEndpoints();
+     * ```
+     *
+     * @link https://github.com/asgardeo/asgardeo-auth-js-sdk/tree/master#getOIDCServiceEndpoints
+     *
+     * @memberof AsgardeoNodeClient
+     *
+     */
+    public async getOIDCServiceEndpoints(): Promise<OIDCEndpoints> {
+        return this._authCore.getOIDCServiceEndpoints();
+    }
+
+    /**
+     * This method returns the decoded ID token payload.
+     * @param {string} userId - The userId of the user.
+     * (If you are using ExpressJS, you may get this from the request cookies)
+     *
+     * @return {Promise<DecodedIDTokenPayload>} -A Promise that resolves with
+     * an object containing the decoded ID token payload.
+     *
+     * @example
+     * ```
+     * const decodedIDTokenPayload = await auth.getDecodedIDToken("a2a2972c-51cd-5e9d-a9ae-058fae9f7927");
+     * ```
+     *
+     * @link https://github.com/asgardeo/asgardeo-auth-js-sdk/tree/master#getDecodedIDToken
+     *
+     * @memberof AsgardeoNodeClient
+     *
+     */
+    public async getDecodedIDToken(userId?: string): Promise<DecodedIDTokenPayload> {
+        return this._authCore.getDecodedIDToken(userId);
+    }
+
+    /**
+     * This method returns the access token.
+     * @param {string} userId - The userId of the user.
+     * (If you are using ExpressJS, you may get this from the request cookies)
+     *
+     * @return {Promise<string>} -A Promise that resolves with 
+     * the access token stored in the store
+     *
+     * @example
+     * ```
+     *const accessToken = await auth.getAccessToken("a2a2972c-51cd-5e9d-a9ae-058fae9f7927");
+     * ```
+     *
+     * @link https://github.com/asgardeo/asgardeo-auth-js-sdk/tree/master#getAccessToken
+     *
+     * @memberof AsgardeoNodeClient
+     *
+     */
+    public async getAccessToken(userId?: string): Promise<string> {
+        return this._authCore.getAccessToken(userId);
+    }
+
+    /**
+     * This method returns Promise that resolves with the token information 
+     * or the response returned by the server depending on the configuration passed.
+     * @param {CustomGrantConfig} config - The config object contains attributes that would be used 
+     * to configure the custom grant request.
+     *
+     * @param {string} userId - The userId of the user.
+     * (If you are using ExpressJS, you may get this from the request cookies)
+     * 
+     * @return {Promise<TokenResponse | FetchResponse>} -A Promise that resolves with the token information 
+     * or the response returned by the server depending on the configuration passed.
+     *
+     * @example
+     * ```
+     *const config = {
+     *      attachToken: false,
+     *      data: {
+     *          client_id: "{{clientID}}",
+     *          grant_type: "account_switch",
+     *          scope: "{{scope}}",
+     *          token: "{{token}}",
+     *       },
+     *      id: "account-switch",
+     *      returnResponse: true,
+     *      returnsSession: true,
+     *      signInRequired: true
+     *   }
+
+     * auth.requestCustomGrant(config).then((response)=>{
+     *     console.log(response);
+     * }).catch((error)=>{
+     *     console.error(error);
+     * });
+     * ```
+     *
+     * @link https://github.com/asgardeo/asgardeo-auth-js-sdk/tree/master#requestCustomGrant
+     *
+     * @memberof AsgardeoNodeClient
+     *
+     */
+    public async requestCustomGrant(config: CustomGrantConfig, userId?: string)
+        : Promise<TokenResponse | FetchResponse> {
+        return this._authCore.requestCustomGrant(config, userId);
+    }
+
+    /**
+     * This method can be used to update the configurations passed into the constructor of the AsgardeoAuthClient.
+     * @param {AuthClientConfig<T>} config - The config object containing the attributes 
+     * that can be used to configure the SDK
+     *
+     * @return {Promise<void>} -A Promise that resolves with a void.
+     *
+     * @example
+     * ```
+     * const updateConfig = await auth.updateConfig({
+     *       signOutRedirectURL: "http://localhost:3000/sign-out"
+     *   });
+     * ```
+     *
+     * @link https://github.com/asgardeo/asgardeo-auth-js-sdk/tree/master#updateConfig
+     *
+     * @memberof AsgardeoNodeClient
+     *
+     */
+    public async updateConfig(config: Partial<AuthClientConfig<T>>): Promise<void> {
+        return this._authCore.updateConfig(config);
+    }
+
+    /**
+     * This method returns a Promise that resolves with the response returned by the server.
+     * @param {string} userId - The userId of the user.
+     * (If you are using ExpressJS, you may get this from the request cookies)
+     *
+     * @return {Promise<FetchResponse>} -A Promise that resolves with the response returned by the server.
+     *
+     * @example
+     * ```
+     *const revokeToken = await auth.revokeAccessToken("a2a2972c-51cd-5e9d-a9ae-058fae9f7927");
+     * ```
+     *
+     * @link https://github.com/asgardeo/asgardeo-auth-js-sdk/tree/master#revokeAccessToken
+     *
+     * @memberof AsgardeoNodeClient
+     *
+     */
+    public async revokeAccessToken(userId?: string): Promise<FetchResponse> {
+        return this._authCore.revokeAccessToken(userId);
+    }
+
+    /**
+     * This method returns if the user has been successfully signed out or not.
+     * @param {string} signOutRedirectURL - The URL to which the user is redirected to 
+     * after signing out from the server.
+     *
+     * @return {boolean} - A boolean value indicating if the user has been signed out or not.
+     *
+     * @example
+     * ```
+     * const isSignedOut = auth.isSignOutSuccessful(<signout_url>);;
+     * ```
+     *
+     * @link https://github.com/asgardeo/asgardeo-auth-js-sdk/tree/master#isSignOutSuccessful
+     *
+     * @memberof AsgardeoNodeClient
+     *
+     */
+    public static isSignOutSuccessful(signOutRedirectURL: string): boolean {
+        return AsgardeoNodeClient.isSignOutSuccessful(signOutRedirectURL);
+    }
+
+    /**
+     * This method returns if sign-out failed or not
+     * @param {string} signOutRedirectURL - The URL to which the user is redirected to 
+     * after signing out from the server.
+     *
+     * @return {boolean} - A boolean value indicating if sign-out failed or not.
+     *
+     * @example
+     * ```
+     * const isSignedOut = auth.isSignOutSuccessful(<signout_url>);
+     * ```
+     *
+     * @link https://github.com/asgardeo/asgardeo-auth-js-sdk/tree/master#didSignOutFail
+     *
+     * @memberof AsgardeoNodeClient
+     *
+     */
+    public static didSignOutFail(signOutRedirectURL: string): boolean {
+        return AsgardeoNodeClient.didSignOutFail(signOutRedirectURL);
+    }
+
 }
+
