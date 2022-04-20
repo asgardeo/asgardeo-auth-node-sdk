@@ -6,8 +6,6 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/wso2/product-is/blob/master/LICENSE)
 [![Twitter](https://img.shields.io/twitter/follow/wso2.svg?style=social&label=Follow)](https://twitter.com/intent/follow?screen_name=wso2)
 
-🚧 &ensp;&ensp;This project is a work in progress. Please do not use this yet!
-
 ## Table of Content
 
 - [Introduction](#introduction)
@@ -75,7 +73,7 @@ const { AsgardeoAuth } = require('@asgardeo/auth-nodejs-sdk');
 const config = {
     clientID: "<your_client_id>",
     clientSecret: "<your_client_secret>",
-    serverOrigin: "https://api.asgardeo.io/t/<org_name>",
+    baseUrl: "https://api.asgardeo.io/t/<org_name>",
     signInRedirectURL: "http://localhost:3000/auth/login",
     signOutRedirectURL: "http://localhost:3000",
     scope: ["openid", "profile"]
@@ -90,7 +88,7 @@ app.use(cookieParser());
 const authClient = new AsgardeoAuth(config);
 
 // Implement a login route.
-// For this example, we will define the login route as '/auth/sign-in'. 
+// For this example, we will define the login route as '/auth/sign-in'.
 // You can change this to match your use case.
 app.get("/auth/sign-in", (req, res) => {
 
@@ -99,7 +97,7 @@ app.get("/auth/sign-in", (req, res) => {
 
     // If the user ID is not present, create a new user ID.
     if (!userID) {
-        userID = uuidv4(); 
+        userID = uuidv4();
     }
 
     // Define the callback function of the 'signIn' method
@@ -156,7 +154,7 @@ new AsgardeoAuth(config:AuthClientConfig<T>, store?: Store);
 
 1. config: [`AuthClientConfig<T>`](#AuthClientConfigT)
 
-   This contains the configuration information needed to implement authentication such as the client ID, server origin etc. Additional configuration information that is needed to be stored can be passed by extending the type of this argument using the generic type parameter. For example, if you want the config to have an attribute called `foo`, you can create an interface called `Bar` in TypeScript and then pass that interface as the generic type to `AuthClientConfig` interface. To learn more about what attributes can be passed into this object, refer to the [`AuthClientConfig<T>`](#AuthClientConfigT) section.
+   This contains the configuration information needed to implement authentication such as the client ID, base URL etc. Additional configuration information that is needed to be stored can be passed by extending the type of this argument using the generic type parameter. For example, if you want the config to have an attribute called `foo`, you can create an interface called `Bar` in TypeScript and then pass that interface as the generic type to `AuthClientConfig` interface. To learn more about what attributes can be passed into this object, refer to the [`AuthClientConfig<T>`](#AuthClientConfigT) section.
 
    ```TypeScript
    interface Bar {
@@ -174,7 +172,7 @@ new AsgardeoAuth(config:AuthClientConfig<T>, store?: Store);
        signInRedirectURL: "http://localhost:3000/sign-in",
        signOutRedirectURL: "http://localhost:3000/login",
        clientID: "client ID",
-       serverOrigin: "https://api.asgardeo.io/t/<org_name>"
+       baseUrl: "https://api.asgardeo.io/t/<org_name>"
    };
    ```
 
@@ -663,7 +661,7 @@ This model has the following attributes.
 |`prompt`|Optional| `string`|""|Specifies the prompt type of an OIDC request|
 |`responseMode`|Optional| `ResponseMode`|`"query"`|Specifies the response mode. The value can either be `query` or `form_post`|
 |`scope`|Optional| `string[]`|`["openid"]`|Specifies the requested scopes.|
-|`serverOrigin`|Required| `string`|""|The origin of the Identity Provider. eg: `https://api.asgardeo.io/t/<org_name>`|
+|`baseUrl`|Required| `string`|""|The origin of the Identity Provider. eg: `https://api.asgardeo.io/t/<org_name>`|
 |`endpoints`|Optional| `OIDCEndpoints`|[OIDC Endpoints Default Values](#oidc-endpoints)|The OIDC endpoint URLs. The SDK will try to obtain the endpoint URLS |using the `.well-known` endpoint. If this fails, the SDK will use these endpoint URLs. If this attribute is not set, then the default endpoint URLs will be |used. However, if the `overrideWellEndpointConfig` is set to `true`, then this will override the endpoints obtained from the `.well-known` endpoint. |
 |`overrideWellEndpointConfig`|Optional| `boolean` | `false` | If this option is set to `true`, then the `endpoints` object will override endpoints obtained |from the `.well-known` endpoint. If this is set to `false`, then this will be used as a fallback if the request to the `.well-known` endpoint fails.|
 |`wellKnownEndpoint`|Optional| `string`|`"/oauth2/token/.well-known/openid-configuration"`| The URL of the `.well-known` endpoint.|
