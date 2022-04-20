@@ -99,7 +99,6 @@ app.get("/auth/login", (req, res) => {
                 res.redirect("/");
             }
         }).catch((err) => {
-            console.log(err)
             res.redirect("/?error=true");
         })
 });
