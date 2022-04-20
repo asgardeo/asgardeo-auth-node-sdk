@@ -1,35 +1,47 @@
 {
-  "name": "@asgardeo/auth-node-sdk",
-  "version": "0.0.1",
-  "description": "Asgardeo Auth Node.js SDK and Sample Apps",
-  "main": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
-  "module": "src/index.ts",
-  "scripts": {
-    "lint": "eslint --ext .js,.ts .",
-    "fix-lint": "eslint --ext .js,.ts . --fix",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "cross-env NODE_ENV=production rimraf dist && yarn run type-check",
-    "clean": "rimraf node_modules && rimraf package-lock.json && rimraf yarn.lock && rimraf dist",
-    "type-check": "tsc"
-  },
-  "keywords": [],
-  "author": "Asgardeo",
-  "license": "Apache-2.0",
-  "devDependencies": {
-    "@types/node": "^17.0.15",
-    "cross-env": "^7.0.3",
-    "rimraf": "^3.0.2",
-    "typescript": "^4.5.2"
-  },
-  "dependencies": {
-    "@asgardeo/auth-js": "^2.0.6",
-    "base64url": "^3.0.1",
-    "cross-fetch": "^3.1.4",
-    "fast-sha256": "^1.3.0",
-    "jose": "^4.3.7",
-    "memory-cache": "^0.2.0",
-    "secure-random-bytes": "^3.0.1",
-    "uuid": "^8.3.2"
-  }
+    "name": "@asgardeo/auth-node",
+    "version": "0.0.1",
+    "description": "Asgardeo Auth Node SDK for Node.js Applications.",
+    "main": "dist/src/index.js",
+    "types": "dist/src/index.d.ts",
+    "module": "src/index.ts",
+    "keywords": [
+        "WSO2",
+        "WSO2-IS",
+        "WSO2 Identity Server",
+        "WSO2 Identity Apps",
+        "authentication",
+        "OIDC",
+        "SDK",
+        "Javascript",
+        "Asgardeo",
+        "Node",
+        "Node.js"
+    ],
+    "scripts": {
+        "lint": "eslint --ext .js,.ts .",
+        "fix-lint": "eslint --ext .js,.ts . --fix",
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "cross-env NODE_ENV=production rimraf dist && yarn run type-check",
+        "clean": "rimraf node_modules && rimraf package-lock.json && rimraf yarn.lock && rimraf dist",
+        "type-check": "tsc"
+    },
+    "author": "Asgardeo",
+    "license": "Apache-2.0",
+    "devDependencies": {
+        "@types/node": "^17.0.15",
+        "cross-env": "^7.0.3",
+        "rimraf": "^3.0.2",
+        "typescript": "^4.5.2"
+    },
+    "dependencies": {
+        "@asgardeo/auth-js": "^2.0.6",
+        "base64url": "^3.0.1",
+        "cross-fetch": "^3.1.4",
+        "fast-sha256": "^1.3.0",
+        "jose": "^4.3.7",
+        "memory-cache": "^0.2.0",
+        "secure-random-bytes": "^3.0.1",
+        "uuid": "^8.3.2"
+    }
 }
