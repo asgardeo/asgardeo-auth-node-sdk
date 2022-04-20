@@ -16,16 +16,16 @@
  * under the License.
  */
 
-const express = require("express");
-const cookieParser = require("cookie-parser");
 const { AsgardeoNodeClient } = require("@asgardeo/auth-node-sdk");
-const config = require("./config.json");
-const { v4: uuidv4 } = require("uuid");
+const cookieParser = require("cookie-parser");
+const express = require("express");
 const rateLimit = require("express-rate-limit");
+const { v4: uuidv4 } = require("uuid");
+const config = require("./config.json");
 
 const limiter = rateLimit({
-    windowMs: 1 * 60 * 1000, // 1 minute
-    max: 5
+    max: 100,
+    windowMs: 1 * 60 * 1000 // 1 minute
 });
 
 //Constants
@@ -45,11 +45,11 @@ app.use("/", express.static("static"));
 const authClient = new AsgardeoNodeClient(config);
 
 const dataTemplate = {
-    isConfigPresent: Boolean(config && config.clientID && config.clientSecret),
-    isAuthenticated: false,
-    idToken: null,
+    authenticateResponse: null,
     error: false,
-    authenticateResponse: null
+    idToken: null,
+    isAuthenticated: false,
+    isConfigPresent: Boolean(config && config.clientID && config.clientSecret)
 };
 
 //Routes
@@ -85,7 +85,11 @@ app.get("/auth/login", (req, res) => {
     const redirectCallback = (url) => {
         if (url) {
             // Make sure you use the httpOnly and sameSite to prevent from cross-site request forgery (CSRF) attacks.
-            res.cookie("ASGARDEO_SESSION_ID", userID, { maxAge: 900000, httpOnly: true, sameSite: "lax" });
+            res.cookie("ASGARDEO_SESSION_ID", userID, {
+                httpOnly: true,
+                maxAge: 900000,
+                sameSite: "lax"
+            });
             res.redirect(url);
 
             return;
@@ -98,9 +102,10 @@ app.get("/auth/login", (req, res) => {
             if (response.accessToken || response.idToken) {
                 res.redirect("/");
             }
-        }).catch((err) => {
-            res.redirect("/?error=true");
         })
+        .catch(() => {
+            res.redirect("/?error=true");
+        });
 });
 
 app.get("/auth/logout", (req, res) => {
@@ -122,5 +127,6 @@ app.get("/auth/logout", (req, res) => {
 
 //Start the app and listen on PORT 5000
 app.listen(PORT, () => {
+    // eslint-disable-next-line no-console
     console.log(`Server Started at PORT ${ PORT }`);
 });
