@@ -1,5 +1,5 @@
 {
-  "name": "@asgardeo/auth-node-sample",
+  "name": "@asgardeo/auth-node-app",
   "description": "A sample app to demonstrate the usage of @asgardeo/asgardeo-auth-node",
   "version": "0.0.1",
   "main": "index.js",

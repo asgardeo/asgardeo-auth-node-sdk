@@ -1,8 +1,8 @@
 {
   "name": "asgardeo-auth-node-sdk",
   "version": "0.0.1",
-  "description": "Asgardeo Auth Node.js SDK and Sample Apps",
-  "main": "index.js",
+  "description": "Asgardeo Auth Node SDK and Sample Apps",
+  "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "lerna run build --stream",
