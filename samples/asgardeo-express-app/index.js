@@ -16,7 +16,7 @@
  * under the License.
  */
 
-const { AsgardeoNodeClient } = require("@asgardeo/auth-node-sdk");
+const { AsgardeoNodeClient } = require("@asgardeo/auth-node");
 const cookieParser = require("cookie-parser");
 const express = require("express");
 const rateLimit = require("express-rate-limit");
