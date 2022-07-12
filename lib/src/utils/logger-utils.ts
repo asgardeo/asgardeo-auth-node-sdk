@@ -47,6 +47,19 @@ export class Logger {
             );
     }
 
+    public static info(message: string): void {
+        if (LogLevel[this.LOG_LEVEL] <= LogLevel.INFO)
+            console.log(
+                LOGGER_CONFIG.bgWhite,
+                LOGGER_CONFIG.fgBlack,
+                "INFO",
+                LOGGER_CONFIG.reset,
+                LOGGER_CONFIG.fgWhite,
+                message,
+                LOGGER_CONFIG.reset
+            );
+    }
+
     public static warn(message: string): void {
         if (LogLevel[this.LOG_LEVEL] <= LogLevel.WARN)
             console.log(
