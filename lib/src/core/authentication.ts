@@ -246,6 +246,10 @@ export class AsgardeoNodeCore<T> {
 
     public static isSignOutSuccessful(signOutRedirectURL: string): boolean{
         return AsgardeoNodeCore.isSignOutSuccessful(signOutRedirectURL);
-    } 
+    }
+
+    public getDataLayer(): DataLayer<T> {
+        return this._dataLayer;
+    }
     
 }
