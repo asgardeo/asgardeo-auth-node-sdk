@@ -19,13 +19,23 @@
 /* eslint-disable no-console */
 
 import { LOGGER_CONFIG } from "../constants";
+
+enum LogLevel {
+    DEBUG,
+    INFO,
+    WARN,
+    ERROR,
+    OFF
+}
+
 export class Logger {
+    static LOG_LEVEL = process.env.LOG_LEVEL ?? LogLevel[LogLevel.OFF];
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     private constructor() { }
 
     public static debug(message: string): void {
-        if (process.env.DEBUG)
+        if (LogLevel[this.LOG_LEVEL] <= LogLevel.DEBUG)
             console.log(
                 LOGGER_CONFIG.bgGreen,
                 LOGGER_CONFIG.fgBlack,
@@ -37,8 +47,21 @@ export class Logger {
             );
     }
 
+    public static info(message: string): void {
+        if (LogLevel[this.LOG_LEVEL] <= LogLevel.INFO)
+            console.log(
+                LOGGER_CONFIG.bgWhite,
+                LOGGER_CONFIG.fgBlack,
+                "INFO",
+                LOGGER_CONFIG.reset,
+                LOGGER_CONFIG.fgWhite,
+                message,
+                LOGGER_CONFIG.reset
+            );
+    }
+
     public static warn(message: string): void {
-        if (process.env.DEBUG)
+        if (LogLevel[this.LOG_LEVEL] <= LogLevel.WARN)
             console.log(
                 LOGGER_CONFIG.bgYellow,
                 LOGGER_CONFIG.fgBlack,
@@ -51,7 +74,7 @@ export class Logger {
     }
 
     public static error(message: string): void {
-        if (process.env.DEBUG)
+        if (LogLevel[this.LOG_LEVEL] <= LogLevel.ERROR)
             console.log(
                 LOGGER_CONFIG.bgRed,
                 LOGGER_CONFIG.fgBlack,

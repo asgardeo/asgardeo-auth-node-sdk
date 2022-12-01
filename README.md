@@ -29,11 +29,13 @@
 
 - [Data Storage](#data-storage)
   - [Data Layer](#data-layer)
-    [Models](#models)
+- [Models](#models)
   - [AuthClientConfig\<T>](#AuthClientConfigT)
   - [Store](#Store)
   - [NodeTokenResponse](#NodeTokenResponse)
   - [URLResponse](#URLResponse)
+- [Logging](#logging)
+  - [Configuring the logger](#configuring-the-logger)
 - [Develop](#develop)
 - [Contribute](#contribute)
 - [License](#license)
@@ -719,6 +721,28 @@ const urlCallbackHandler = (url: string): void => {
     res.redirect(url);
 }
 ```
+---
+
+## Logging
+
+The SDK supports the following log levels. `DEBUG` is the lowest log level while `OFF` is the highest.
+
+| Level   | Description                                                 |
+|---------|-------------------------------------------------------------|
+| `DEBUG` | Log messages intended for debugging purposes.               |
+| `INFO`  | Log messages intended for typical logging purposes.         |
+| `WARN`  | Log messages that designates potentially harmful scenarios. |
+| `ERROR` | Log messages that designates error scenarios.               |
+| `OFF`   | Turns the logging off.                                      |
+
+Setting the application's log level to a certain log level will filter out messages from all the log levels below it. For example, if the application 
+log level was`INFO`, only `INFO`,`WARN` and `ERROR` messages are logged. 
+
+### Configuring the Logger
+
+In order to configure te logger, the developers need to provide `LOG_LEVEL` as an environment variable. The log level is set to `OFF` by default. 
+
+> Please note that the `LOG_LEVEL` config only accepts the above log level values, and any other value will be ignored.
 
 ---
 
