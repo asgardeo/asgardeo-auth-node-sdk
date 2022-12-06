@@ -751,14 +751,14 @@ In order to configure te logger, the developers need to provide `LOG_LEVEL` as a
 ### Prerequisites
 
 - `Node.js` (version 10 or above).
-- `npm` package manager.
+- `yarn` package manager.
 
 ### Installing Dependencies
 
 The repository is a mono repository. The SDK repository is found in the [lib](https://github.com/asgardeo/asgardeo-auth-node-sdk/tree/master/lib) directory. You can install the dependencies by running the following command at the root.
 
 ```
-npm run build
+yarn run build
 ```
 
 ## Contribute
