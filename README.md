@@ -740,7 +740,7 @@ log level was`INFO`, only `INFO`,`WARN` and `ERROR` messages are logged.
 
 ### Configuring the Logger
 
-In order to configure te logger, the developers need to provide `LOG_LEVEL` as an environment variable. The log level is set to `OFF` by default. 
+In order to configure the logger, the developers need to provide `LOG_LEVEL` as an environment variable. The log level is set to `OFF` by default. 
 
 > Please note that the `LOG_LEVEL` config only accepts the above log level values, and any other value will be ignored.
 
