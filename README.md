@@ -54,7 +54,7 @@ If you are using [Asgardeo Cloud](https://wso2.com/asgardeo/) as the identity se
 Install the library from the npm registry.
 
 ```
-npm install @asgardeo/auth-nodejs-sdk
+npm install @asgardeo/auth-node
 ```
 
 ## Getting Started
