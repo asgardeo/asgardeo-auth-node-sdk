@@ -47,7 +47,7 @@ Asgardeo Auth NodeJS SDK provides the core methods that are needed to implement 
 ## Prerequisites
 
 Create an organization in Asgardeo if you don't already have one. The organization name you choose will be referred to as `<org_name>` throughout this documentation.
-If you are using [Asgardeo Cloud](https://wso2.com/asgardeo/) as the identity server, create a **Standard-Based Application** in the console.
+If you are using [Asgardeo](https://wso2.com/asgardeo/) as the identity server (IdP), create a **Standard-Based Application** in the console.
 
 ## Install
 
@@ -69,25 +69,27 @@ const { v4: uuidv4 } = require("uuid");
 
 // Import the Asgardeo Node SDK
 // The SDK provides a client that can be used to carry out the authentication.
-const { AsgardeoAuth } = require('@asgardeo/auth-nodejs-sdk');
+const { AsgardeoNodeClient } = require("@asgardeo/auth-node");
 
 // Create a config object containing the necessary configurations.
 const config = {
     clientID: "<your_client_id>",
     clientSecret: "<your_client_secret>",
     baseUrl: "https://api.asgardeo.io/t/<org_name>",
-    signInRedirectURL: "http://localhost:3000/auth/login",
+    signInRedirectURL: "http://localhost:3000/auth/sign-in",
     signOutRedirectURL: "http://localhost:3000",
     scope: ["openid", "profile"]
 };
+
+//If you are using Asgardeo as the IdP,make sure to add 'http://localhost:3000/auth/sign-in' as an authorized redirect URL and 'http://localhost:3000' as an allowed origin.
 
 // Create an express app  and setup
 const PORT = 3000;
 const app = express();
 app.use(cookieParser());
 
-// Instantiate the AsgardeoAuthClient and pass the config object as an argument into the constructor.
-const authClient = new AsgardeoAuth(config);
+// Instantiate the AsgardeoNodeClient and pass the config object as an argument into the constructor.
+const authClient = new AsgardeoNodeClient(config);
 
 // Implement a login route.
 // For this example, we will define the login route as '/auth/sign-in'.
@@ -135,8 +137,14 @@ app.get("/auth/sign-in", (req, res) => {
             res.redirect("/errorPage");
         });
 
-    // Now you have successfully implemented a login endpoint with Asgardeo Node SDK.
+    // Now you have successfully implemented the /sign-in endpoint with Asgardeo Node SDK.
     // Please refer to the sample app to see the how to implement the other functionalities.
+    
+});
+
+//Start the app and listen on PORT 3000
+app.listen(PORT, () => {
+    console.log(`Server Started at PORT ${ PORT }`);
 });
 
 ```
