@@ -81,7 +81,7 @@ const config = {
     scope: ["openid", "profile"]
 };
 
-//If you are using Asgardeo as the IdP,make sure to add 'http://localhost:3000/auth/sign-in' as an authorized redirect URL and 'http://localhost:3000' as an allowed origin.
+//If you are using Asgardeo as the IdP, make sure to add 'http://localhost:3000/auth/sign-in' as an authorized redirect URL and 'http://localhost:3000' as an allowed origin.
 
 // Create an express app  and setup
 const PORT = 3000;
