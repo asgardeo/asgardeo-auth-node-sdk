@@ -269,19 +269,19 @@ export class AsgardeoNodeClient<T> {
      *
      * @example
      * ```
-     *const config = {
+     * const config = {
      *      attachToken: false,
      *      data: {
      *          client_id: "{{clientID}}",
      *          grant_type: "account_switch",
      *          scope: "{{scope}}",
      *          token: "{{token}}",
-     *       },
+     *      },
      *      id: "account-switch",
      *      returnResponse: true,
      *      returnsSession: true,
      *      signInRequired: true
-     *   }
+     * }
 
      * auth.requestCustomGrant(config).then((response)=>{
      *     console.log(response);
@@ -332,7 +332,7 @@ export class AsgardeoNodeClient<T> {
      *
      * @example
      * ```
-     *const revokeToken = await auth.revokeAccessToken("a2a2972c-51cd-5e9d-a9ae-058fae9f7927");
+     * const revokeToken = await auth.revokeAccessToken("a2a2972c-51cd-5e9d-a9ae-058fae9f7927");
      * ```
      *
      * @link https://github.com/asgardeo/asgardeo-auth-js-sdk/tree/master#revokeAccessToken
@@ -342,6 +342,28 @@ export class AsgardeoNodeClient<T> {
      */
     public async revokeAccessToken(userId?: string): Promise<FetchResponse> {
         return this._authCore.revokeAccessToken(userId);
+    }
+
+    /**
+     * This method refreshes the access token and returns a Promise that resolves with the new access
+     * token and other relevant data.
+     *
+     * @param {string} userId - A unique ID of the user to be authenticated. This is useful in multi-user
+     * scenarios where each user should be uniquely identified.
+     *
+     * @returns {Promise<TokenResponse>} - A Promise that resolves with the token response.
+     *
+     * @example
+     * ```
+     * const tokenResponse = await auth.refreshAccessToken("a2a2972c-51cd-5e9d-a9ae-058fae9f7927")
+     * ```
+     *
+     * @link https://github.com/asgardeo/asgardeo-auth-js-sdk/tree/master#refreshAccessToken
+     *
+     * @memberof AsgardeoNodeClient
+     */
+    public refreshAccessToken(userId?: string): Promise<TokenResponse> {
+        return this._authCore.refreshAccessToken(userId);
     }
 
     /**
