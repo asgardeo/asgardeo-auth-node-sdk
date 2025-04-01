@@ -22,6 +22,7 @@
   - [getOIDCServiceEndpoints](#getOIDCServiceEndpoints)
   - [getAccessToken](#getAccessToken)
   - [revokeAccessToken](#revokeAccessToken)
+  - [refreshAccessToken](#refreshAccessToken)
   - [requestCustomGrant](#requestCustomGrant)
   - [updateConfig](#updateConfig)
   - [isSignOutSuccessful](#isSignOutSuccessful)
@@ -485,6 +486,35 @@ This method clears the authentication data and sends a request to revoke the acc
 ```TypeScript
 // This should be within an async function.
 const revokeToken = await auth.revokeAccessToken("a2a2972c-51cd-5e9d-a9ae-058fae9f7927");
+```
+
+---
+
+### refreshAccessToken
+
+```TypeScript
+refreshAccessToken(userID?: string): Promise<TokenResponse>
+```
+
+#### Argument
+
+1. userID: `string` (optional)
+
+    If you want to use the SDK to manage multiple user sessions, you can pass a unique ID here. This can be useful when this SDK is used in backend applications.
+
+#### Returns
+
+A Promise that resolves with the token response that contains the token information.
+
+#### Description
+
+This method sends a refresh-token request and returns a promise that resolves with the token information. To learn more about what information is returned, checkout the [`TokenResponse`](#TokenResponse) model. The existing authentication data in the store is automatically updated with the new information returned by this request.
+
+#### Example
+
+```TypeScript
+// This should be within an async function.
+const tokenResponse = await auth.refreshAccessToken("a2a2972c-51cd-5e9d-a9ae-058fae9f7927")
 ```
 
 ---

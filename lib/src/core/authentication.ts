@@ -168,7 +168,7 @@ export class AsgardeoNodeCore<T> {
         }
     }
 
-    public async refreshAccessToken(userId: string): Promise<TokenResponse> {
+    public async refreshAccessToken(userId?: string): Promise<TokenResponse> {
         return this._auth.refreshAccessToken(userId);
     }
 
